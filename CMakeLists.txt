@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+
+cmake_minimum_required(VERSION 3.20.0)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(my_bmk_led)
+
+FILE(GLOB app_sources src/*.c)
+target_sources(app PRIVATE
+  src/main.c
+  src/board.c
+  src/version.c
+  src/keyboard.c
+  src/led_strip.c
+  src/display/pics.c
+)

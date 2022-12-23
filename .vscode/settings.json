@@ -1,0 +1,32 @@
+{
+    "nrf-connect.applications": [
+        "${workspaceFolder}"
+    ],
+    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.2.0}",
+    "files.associations": {
+        "dk_buttons_and_leds.h": "c",
+        "slist.h": "c",
+        "settings.h": "c",
+        "zephyr.h": "c",
+        "kernel.h": "c",
+        "kernel_includes.h": "c",
+        "pics.h": "c",
+        "nrfx.h": "c",
+        "nrfx_errors.h": "c",
+        "board.h": "c",
+        "chrono": "c",
+        "random": "c",
+        "dis.h": "c",
+        "bluetooth.h": "c",
+        "device.h": "c",
+        "stdio.h": "c",
+        "lvgl.h": "c",
+        "lv_api_map.h": "c",
+        "lvgl_sample.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "nrf-connect.debugging.bindings": {
+        "${workspaceFolder}/build_1": "Launch build_1"
+    },
+    "nrf-connect.topdir": "${nrf-connect.sdk:2.2.0}"
+}
