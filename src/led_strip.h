@@ -16,6 +16,7 @@ extern uint8_t gta_pattern[];
 int led_strip_init(void);
 int set_button_color(uint8_t position, uint8_t color);
 int set_button_pattern_gta(void);
+int set_button_pattern_my(void);
 
 
 #endif

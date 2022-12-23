@@ -1077,9 +1077,9 @@ void thread_led(void)
 void main(void)
 {
 	int err;
-	const struct device *display_dev;
+	//const struct device *display_dev;
 
-	uint32_t lcd_tmp=10;
+	//uint32_t lcd_tmp=10;
 
 	// size_t cursor = 0, color = 0;
 	// int rc;
@@ -1152,7 +1152,7 @@ void main(void)
 	// set_button_color(1,COLOR_WHITE);
 	// set_button_color(2,COLOR_RED);
 	// set_button_color(3,COLOR_GREEN);
-	//set_button_color(4,COLOR_BLUE);
+	// set_button_color(4,COLOR_BLUE);
 	// set_button_color(5,COLOR_YELLOW);
 	// set_button_color(6,COLOR_VIOLET);
 	// set_button_color(7,COLOR_TURQUOISE);
@@ -1163,7 +1163,7 @@ void main(void)
 	//set_button_pattern(gta_pattern);
 	//set_button_pattern_gta();
 	//set_button_color(4,COLOR_BLACK);
-
+	set_button_pattern_my();
 	
 
 	while (1) 
@@ -1187,9 +1187,11 @@ void main(void)
 	 	// 		color = 0;
 	 	// 	}
 	 	// }
-		set_button_color(4,COLOR_BLUE);
-	 	k_sleep(K_MSEC(1000));
-		set_button_color(4,COLOR_BLACK);
+
+
+		// set_button_color(4,COLOR_BLUE);
+	 	// k_sleep(K_MSEC(1000));
+		// set_button_color(4,COLOR_BLACK);
 		k_sleep(K_MSEC(1000));
 	 }
 

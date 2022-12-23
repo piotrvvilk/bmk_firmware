@@ -34,11 +34,23 @@ struct led_rgb pixels[STRIP_NUM_PIXELS];
 
 static const struct device *const strip = DEVICE_DT_GET(STRIP_NODE);
 
-uint8_t gta_pattern[30] = { 0x20, 0x2F, 0x2F, 0x00, 0x2f, 0x00, 0x20, 0x2F, 0x2F,
-		         				   0x2f, 0x00, 0x00, 0x2f, 0x00, 0x00, 0x2f, 0x00, 0x00, 0x2f, 0x00, 0x00,
-				        		   0x2f, 0x00, 0x00, 0x2f, 0x00, 0x00, 0x2f, 0x00, 0x00};
+uint8_t gta_pattern[40] = { 0x00, 0x20, 0x2F, 0x2F, 
+							0x00, 0x00, 0x2f, 0x00, 
+							0x00, 0x20, 0x2F, 0x2F,
+		         			0x00, 0x2f, 0x00, 0x00, 
+							0x00, 0x2f, 0x00, 0x00, 
+							0x00, 0x2f, 0x00, 0x00, 
+							0x00, 0x2f, 0x00, 0x00,
+				        	0x00, 0x2f, 0x00, 0x00, 
+							0x00, 0x2f, 0x00, 0x00, 
+							0x00, 0x2f, 0x00, 0x00};
 
+union Pat{
+	struct led_rgb pix[STRIP_NUM_PIXELS];
+	uint8_t data[4*STRIP_NUM_PIXELS];
+};
 
+union Pat my_pix;
 
 //=================================================================================================================
 int led_strip_init(void)
@@ -74,6 +86,16 @@ int set_button_pattern_gta(void)
 	}
 	
 	rc = led_strip_update_rgb(strip, pixels, STRIP_NUM_PIXELS);
+	return rc;
+}
+
+//=================================================================================================================
+int set_button_pattern_my(void)
+{
+	int rc;
+	memcpy(&my_pix.data, &gta_pattern, 40);
+	
+	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
 	return rc;
 }
 
