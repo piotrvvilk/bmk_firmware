@@ -15,8 +15,6 @@
 #include <zephyr/settings/settings.h>
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/display.h>
-#include <zephyr/drivers/led_strip.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
@@ -30,7 +28,6 @@
 
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
-#include <lvgl.h>
 
 #include "board.h"
 #include "version.h"
@@ -1002,19 +999,14 @@ K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NUL
 
 K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
 
+K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
+
 //==================================================================================================================================================
 //==================================================================================================================================================
 //==================================================================================================================================================
 void main(void)
 {
 	int err;
-	const struct device *display_dev;
-
-	uint32_t lcd_tmp=10;
-
-	size_t cursor = 0, color = 0;
-	int rc;
-
 	LOG_INF("Starting Bluetooth Peripheral PWS example\n");
 	LOG_INF("%s",string_version);
 	LOG_INF("%s",string_date);
@@ -1027,15 +1019,6 @@ void main(void)
 		LOG_INF("GPIO init failed (err %d)\n", err);
 		return;
 	}
-
-//-------------------------------------------------------------------------- DISPLAY
-	#ifdef USE_DISPLAY
-		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
-		if (!device_is_ready(display_dev)) {
-			LOG_ERR("Device not ready, aborting test");
-			return;
-		}
-	#endif
 
 //-------------------------------------------------------------------------- BLE
 	// err = bt_conn_auth_cb_register(&conn_auth_callbacks);
@@ -1074,38 +1057,12 @@ void main(void)
 
 	LOG_INF("START\n");
 
-	
-//==================================================================================================================================================
-	#ifdef USE_DISPLAY
-		lcd_backlight_on();
-			
-		lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
-
-		// // /*Create a white label, set its text and align it to the center*/
-		// lv_obj_t * label = lv_label_create(lv_scr_act());
-		// lv_label_set_text(label, "Hello world");
-		// //lv_label_set_text_font(label, &LV_FONT_MONTSERRAT_20);
-		// lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-		// lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-		LV_IMG_DECLARE(gta_online);
-		lv_obj_t * img1 = lv_img_create(lv_scr_act());
-		lv_img_set_src(img1, &gta_online);
-		lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-		lv_obj_set_size(img1, 240, 160);
-
-
-		lv_task_handler();
-		display_blanking_off(display_dev);
-	#endif
 //==================================================================================================================================================
 	while (1) 
 	{
-
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(100));
     }
 	
-//==================================================================================================================================================
 }
 
 //==================================================================================================================================================

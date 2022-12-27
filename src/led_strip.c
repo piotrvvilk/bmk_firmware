@@ -125,6 +125,7 @@ void thread_led_strip(void)
 	//set_button_color(4,COLOR_BLACK);
 
 	led_strip_init();
+	k_msleep(100);
 	current_pattern = gta_pattern;
 	set_button_pattern(current_pattern);
  	

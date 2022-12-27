@@ -1,6 +1,9 @@
-#ifndef LVGL_SAMPLE_H
-#define LVGL_SAMPLE_H
+#ifndef LCD_H__
+#define LCD_H__
 
-void lv_sample(void);
+#define THREAD_LCD_PRIORITY 					7
+#define THREAD_LCD_STACKSIZE       			    2048
+
+void thread_lcd(void);
 
 #endif
