@@ -1,4 +1,3 @@
-
 #include <stddef.h>
 #include <string.h>
 #include <errno.h>
@@ -13,7 +12,6 @@
 #include <soc.h>
 #include <assert.h>
 #include <zephyr/spinlock.h>
-
 #include <zephyr/settings/settings.h>
 
 #include <zephyr/drivers/gpio.h>
@@ -36,15 +34,13 @@
 #include "board.h"
 #include "version.h"
 #include "led_strip.h"
+#include "led.h"
+#include "keyboard.h"
 
 //#include <lvgl.h>
 //#include "lvgl_sample.h"
 
-#define THREAD_KEYBOARD_PRIORITY 			7
-#define THREAD_LED_PRIORITY 				7
-#define THREAD_KEYBOARD_STACKSIZE       	512
-#define THREAD_LED_STACKSIZE    		   	512
-#define WORQ_THREAD_STACK_SIZE  			512
+#define WORQ_THREAD_STACK_SIZE  					512
 
 #define DEVICE_NAME     CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -115,7 +111,7 @@ enum {
 	INPUT_REP_KEYS_IDX = 0
 };
 
-LOG_MODULE_REGISTER(my_ncs_peripheral,LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 
 /* HIDS instance. */
 BT_HIDS_DEF(hids_obj, OUTPUT_REPORT_MAX_LEN, INPUT_REPORT_KEYS_MAX_LEN);
@@ -177,7 +173,7 @@ K_MSGQ_DEFINE(mitm_queue,
 	      CONFIG_BT_HIDS_MAX_CLIENT_COUNT,
 	      4);
 
-uint32_t key_pressed;
+
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -938,76 +934,11 @@ static void bas_notify(void)
 	bt_bas_set_battery_level(battery_level);
 }
 
-//==================================================================================================================================================
-uint32_t check_keyboard(void)
-{
-	uint32_t result;
-	result=0;
-
-//----------------------------------------------------
-	gpio_pin_set_dt(&col1,0);
-
-	if(gpio_pin_get_dt(&row1)==0)	result = 1;
-	if(gpio_pin_get_dt(&row2)==0)	result = 4;
-	if(gpio_pin_get_dt(&row3)==0)	result = 8;
-
-	gpio_pin_set_dt(&col1,1);
-
-//----------------------------------------------------
-	gpio_pin_set_dt(&col2,0);
-
-	if(gpio_pin_get_dt(&row1)==0)	result = 2;
-	if(gpio_pin_get_dt(&row2)==0)	result = 5;
-	if(gpio_pin_get_dt(&row3)==0)	result = 9;
-
-	gpio_pin_set_dt(&col2,1);
-
-//----------------------------------------------------
-	gpio_pin_set_dt(&col3,0);
-
-	if(gpio_pin_get_dt(&row1)==0)	result = 3;
-	if(gpio_pin_get_dt(&row2)==0)	result = 6;
-	if(gpio_pin_get_dt(&row3)==0)	result = 10;
-
-	gpio_pin_set_dt(&col3,1);
-
-//----------------------------------------------------
-	gpio_pin_set_dt(&col4,0);
-
-	if(gpio_pin_get_dt(&row2)==0)	result = 7;
-
-	gpio_pin_set_dt(&col4,1);
-
-	return result;
-}	
 
 //==================================================================================================================================================
-void thread_keyboard(void)
-{
-	while(1)
-	{
-		key_pressed = check_keyboard();
-		if(key_pressed!=0)
-		{
-			LOG_INF("BUTTON PRESSED: %d",key_pressed);
-		}
 
-		k_msleep(100);
-	}
 
-}
 
-//==================================================================================================================================================
-void thread_led(void)
-{
- 	while(1)
- 	{
-		gpio_pin_toggle_dt(&led_blue);
-		bas_notify();
-		k_msleep(1000);
-	}
-		
-}
 
 //==================================================================================================================================================
 
@@ -1065,11 +996,11 @@ void thread_led(void)
 // #endif
 // }
 //==================================================================================================================================================
-//K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
+K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
 
-//K_THREAD_DEFINE(thread1_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NULL, THREAD_LED_PRIORITY, 0, 0);
+K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NULL, THREAD_LED_PRIORITY, 0, 0);
 
-
+K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -1096,11 +1027,6 @@ void main(void)
 		LOG_INF("GPIO init failed (err %d)\n", err);
 		return;
 	}
-
-//-------------------------------------------------------------------------- LED STRIP
-	led_strip_init();
-
-	vled_on();
 
 //-------------------------------------------------------------------------- DISPLAY
 	// display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -1144,100 +1070,18 @@ void main(void)
 
  	// k_work_init(&pairing_work, pairing_process);
 
-//==================================================================================================================================================
 	LOG_INF("START\n");
 
 //==================================================================================================================================================
-
-	// set_button_color(1,COLOR_WHITE);
-	// set_button_color(2,COLOR_RED);
-	// set_button_color(3,COLOR_GREEN);
-	// set_button_color(4,COLOR_BLUE);
-	// set_button_color(5,COLOR_YELLOW);
-	// set_button_color(6,COLOR_VIOLET);
-	// set_button_color(7,COLOR_TURQUOISE);
-	// set_button_color(8,COLOR_ORANGE);
-
-	//k_sleep(K_MSEC(3000));
-	
-	//set_button_pattern(gta_pattern);
-	//set_button_pattern_gta();
-	//set_button_color(4,COLOR_BLACK);
-	set_button_pattern_my();
-	
-
 	while (1) 
 	{
-	 	// memset(&pixels, 0x00, sizeof(pixels));
-	 	// memcpy(&pixels[cursor], &colors[color], sizeof(struct led_rgb));
-	 	// rc = led_strip_update_rgb(strip, pixels, STRIP_NUM_PIXELS);
 
-	 	// if (rc) 
-		// {
-	 	// 	LOG_ERR("couldn't update strip: %d", rc);
-	 	// }
-
-	 	// cursor++;
-	 	// if (cursor >= STRIP_NUM_PIXELS) 
-		// {
-	 	// 	cursor = 0;
-		// 	color++;
-	 	// 	if (color == ARRAY_SIZE(colors)) 
-		// 	{
-	 	// 		color = 0;
-	 	// 	}
-	 	// }
-
-
-		// set_button_color(4,COLOR_BLUE);
-	 	// k_sleep(K_MSEC(1000));
-		// set_button_color(4,COLOR_BLACK);
 		k_sleep(K_MSEC(1000));
-	 }
+    }
 
 //==================================================================================================================================================
-	//lcd_backlight_on();
-		
-	//lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-    // // /*Create a white label, set its text and align it to the center*/
-    // lv_obj_t * label = lv_label_create(lv_scr_act());
-    // lv_label_set_text(label, "Hello world");
-	// //lv_label_set_text_font(label, &LV_FONT_MONTSERRAT_20);
-	// lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-    // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-    // LV_IMG_DECLARE(gta_online);
-    // lv_obj_t * img1 = lv_img_create(lv_scr_act());
-    // lv_img_set_src(img1, &gta_online);
-    // lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-    // lv_obj_set_size(img1, 240, 160);
-
-
-	// lv_task_handler();
-	// display_blanking_off(display_dev);
-	// while (1) 
-	// {
-	// 	k_sleep(K_MSEC(1000));
-	// }
 	
-	// for(;;) 
-	// {
-	// 	// if(is_adv) 
-	// 	// {
-	// 	// 	gpio_pin_toggle_dt(&led_blue);
-	// 	// } 
-	// 	// else 
-	// 	// {
-	// 	// 	led_blue_off();
-	// 	// }
-		
-	// //	writeCommand(0x55);
-	// 	//screen_clear(GREEN);
-	// 	//k_sleep(K_MSEC(ADV_LED_BLINK_INTERVAL));
-		
-	// 	//bas_notify();
-	// }
 }
 
 //==================================================================================================================================================

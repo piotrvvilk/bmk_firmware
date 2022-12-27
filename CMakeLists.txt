@@ -10,6 +10,7 @@ target_sources(app PRIVATE
   src/board.c
   src/version.c
   src/keyboard.c
+  src/led.c
   src/led_strip.c
   src/display/pics.c
 )
