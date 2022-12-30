@@ -21,6 +21,9 @@
 #define LV_ATTRIBUTE_IMG_GTA_ONLINE
 #endif
 
+#include "../config_app.h"
+
+#ifdef USE_GTA_PICTURE
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_GTA_ONLINE uint8_t gta_online_map[] = {
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP != 0    
 /*Pixel format: Red: 5 bit, Green: 6 bit, Blue: 5 bit BUT the 2 bytes are swapped*/
@@ -196,3 +199,5 @@ const lv_img_dsc_t gta_online = {
   .data_size = 38400 * LV_COLOR_SIZE / 8,
   .data = gta_online_map,
 };
+
+#endif

@@ -999,7 +999,9 @@ K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NUL
 
 K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
+#ifdef USE_DISPLAY
+	K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
+#endif
 
 //==================================================================================================================================================
 //==================================================================================================================================================

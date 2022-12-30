@@ -13,5 +13,7 @@ target_sources(app PRIVATE
   src/led.c
   src/led_strip.c
   src/display.c
-  src/display/pics.c
+  src/display/gta_picture.c
+  src/display/vsc_picture.c
+  src/display/altium_picture.c
 )
