@@ -1,0 +1,114 @@
+#include <stddef.h>
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
+
+#include <zephyr/kernel.h>
+#include <zephyr/kernel_structs.h>
+#include <zephyr/device.h>
+#include <zephyr/types.h>
+#include <zephyr/devicetree.h>
+#include <zephyr/sys/byteorder.h>
+#include <soc.h>
+#include <assert.h>
+#include <zephyr/spinlock.h>
+#include <zephyr/settings/settings.h>
+
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/led_strip.h>
+#include <zephyr/drivers/led.h>
+
+#include <zephyr/sys/printk.h>
+#include <zephyr/logging/log.h>
+
+#include "board.h"
+#include "led_pwm.h"
+#include "led_strip.h"
+
+#define LED_PWM_NODE_ID	 DT_COMPAT_GET_ANY_STATUS_OKAY(pwm_leds)
+
+const char *led_label[] = {
+	DT_FOREACH_CHILD_SEP_VARGS(LED_PWM_NODE_ID, DT_PROP_OR, (,), label, NULL)
+};
+
+const int num_leds = ARRAY_SIZE(led_label);
+
+LOG_MODULE_REGISTER(bmk_led_pwm,LOG_LEVEL_DBG);
+
+uint16_t level;
+
+
+		// err = led_on(led_pwm, 0);
+		// if (err < 0) { LOG_ERR("err=%d", err); return; }
+		// LOG_INF("Turned on");
+		// k_sleep(K_MSEC(1000));
+
+		// err = led_off(led_pwm, 0);
+		// if (err < 0) { LOG_ERR("err=%d", err); return; }
+		// LOG_INF("  Turned off");
+		// k_sleep(K_MSEC(1000));	
+
+
+
+//==================================================================================================================================================
+void thread_led_pwm(void)
+{
+	int err;
+	const struct device *led_pwm;
+	//uint8_t led;
+	
+	vled_on();
+
+	led_pwm = DEVICE_DT_GET(LED_PWM_NODE_ID);
+	if (!device_is_ready(led_pwm)) 
+	{
+		LOG_ERR("Device %s is not ready", led_pwm->name);
+	}
+
+ 	while(1)
+ 	{
+		if(mode_counter==MODE_GTA)
+		{
+			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
+			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+
+			err = led_off(led_pwm, LED_GREEN_PWM); 
+			if (err < 0) { LOG_ERR("err=%d", err); }
+
+			err = led_off(led_pwm, LED_BLUE_PWM); 
+			if (err < 0) { LOG_ERR("err=%d", err); }
+		}
+
+		if(mode_counter==MODE_ALTIUM)
+		{
+			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
+			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+
+			err = led_set_brightness(led_pwm, LED_GREEN_PWM, 5);
+			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 50); }
+
+			err = led_off(led_pwm, LED_BLUE_PWM); 
+			if (err < 0) { LOG_ERR("err=%d", err); }
+		}
+
+		if(mode_counter==MODE_VSC)
+		{
+			err = led_off(led_pwm, LED_RED_PWM); 
+			if (err < 0) { LOG_ERR("err=%d", err); }
+
+			err = led_off(led_pwm, LED_GREEN_PWM); 
+			if (err < 0) { LOG_ERR("err=%d", err); }
+
+			err = led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
+			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+
+		}
+
+		k_msleep(100);
+	}
+		
+}
+
+
+
+//==================================================================================================================================================

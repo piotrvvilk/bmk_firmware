@@ -32,7 +32,7 @@
 #include "board.h"
 #include "version.h"
 #include "led_strip.h"
-#include "led.h"
+#include "led_pwm.h"
 #include "keyboard.h"
 #include "display.h"
 #include "config_app.h"
@@ -995,7 +995,7 @@ static void bas_notify(void)
 //==================================================================================================================================================
 K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NULL, THREAD_LED_PRIORITY, 0, 0);
+K_THREAD_DEFINE(thread_led_pwm_id, THREAD_LED_PWM_STACKSIZE, thread_led_pwm, NULL, NULL, NULL, THREAD_LED_PWM_PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
 
