@@ -9,11 +9,13 @@ target_sources(app PRIVATE
   src/main.c
   src/board.c
   src/version.c
-  src/keyboard.c
+  src/matrix_keyboard.c
   src/led_pwm.c
   src/led_strip.c
   src/display.c
-  src/display/gta_picture.c
-  src/display/vsc_picture.c
-  src/display/altium_picture.c
+  src/lis2dh.c
+  src/max17048.c
+  src/pictures/gta_picture.c
+  src/pictures/vsc_picture.c
+  src/pictures/altium_picture.c
 )

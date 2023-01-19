@@ -29,13 +29,16 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "config_app.h"
+#include "main.h"
 #include "board.h"
+#include "common.h"
 #include "version.h"
 #include "led_strip.h"
 #include "led_pwm.h"
-#include "keyboard.h"
+#include "matrix_keyboard.h"
 #include "display.h"
-#include "config_app.h"
+
 
 #define WORQ_THREAD_STACK_SIZE  					512
 
@@ -54,7 +57,6 @@
 #define KEYS_MAX_LEN                    (INPUT_REPORT_KEYS_MAX_LEN - SCAN_CODE_POS)
 
 #define ADV_LED_BLINK_INTERVAL  1000
-
 
 /* Key used to accept or reject passkey value */
 #define KEY_PAIRING_ACCEPT DK_BTN1_MSK
@@ -113,7 +115,6 @@ LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 /* HIDS instance. */
 BT_HIDS_DEF(hids_obj, OUTPUT_REPORT_MAX_LEN, INPUT_REPORT_KEYS_MAX_LEN);
 
-
 // Define stack area used by workqueue thread
 //static K_THREAD_STACK_DEFINE(my_stack_area, WORQ_THREAD_STACK_SIZE);
 
@@ -169,8 +170,6 @@ K_MSGQ_DEFINE(mitm_queue,
 	      sizeof(struct pairing_data_mitm),
 	      CONFIG_BT_HIDS_MAX_CLIENT_COUNT,
 	      4);
-
-
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -993,11 +992,17 @@ static void bas_notify(void)
 // #endif
 // }
 //==================================================================================================================================================
-K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
+#ifdef USE_KEYBOARD
+	K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
+#endif
 
-K_THREAD_DEFINE(thread_led_pwm_id, THREAD_LED_PWM_STACKSIZE, thread_led_pwm, NULL, NULL, NULL, THREAD_LED_PWM_PRIORITY, 0, 0);
+#ifdef USE_LED_PWM
+	K_THREAD_DEFINE(thread_led_pwm_id, THREAD_LED_PWM_STACKSIZE, thread_led_pwm, NULL, NULL, NULL, THREAD_LED_PWM_PRIORITY, 0, 0);
+#endif 
 
-K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
+#ifdef USE_LED_STRIP
+	K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
+#endif
 
 #ifdef USE_DISPLAY
 	K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
@@ -1023,42 +1028,42 @@ void main(void)
 	}
 
 //-------------------------------------------------------------------------- BLE
-	// err = bt_conn_auth_cb_register(&conn_auth_callbacks);
-	// if(err) 
-	// {
-	// 	LOG_INF("Failed to register authorization callbacks.\n");
-	// 	return;
-	// }
+#ifdef USE_BLE	
+	err = bt_conn_auth_cb_register(&conn_auth_callbacks);
+	if(err) 
+	{
+		LOG_INF("Failed to register authorization callbacks.\n");
+		return;
+	}
 
-	// err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
-	// if(err) 
-	// {
-	// 	LOG_INF("Failed to register authorization info callbacks.\n");
-	// 	return;
-	// }
+	err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
+	if(err) 
+	{
+		LOG_INF("Failed to register authorization info callbacks.\n");
+		return;
+	}
 
-	// err = bt_enable(NULL);
-	// if(err) 
-	// {
-	// 	LOG_INF("Bluetooth init failed (err %d)\n", err);
-	// 	return;
-	// }
+	err = bt_enable(NULL);
+	if(err) 
+	{
+		LOG_INF("Bluetooth init failed (err %d)\n", err);
+		return;
+	}
 
-	// LOG_INF("Bluetooth initialized\n");
+	LOG_INF("Bluetooth initialized\n");
 
-	// hid_init();
+	hid_init();
 
-	// if (IS_ENABLED(CONFIG_SETTINGS)) 
-	// {
-	// 	settings_load();
-	// }
+	if (IS_ENABLED(CONFIG_SETTINGS)) 
+	{
+		settings_load();
+	}
 
- 	// advertising_start();
+ 	advertising_start();
 
- 	// k_work_init(&pairing_work, pairing_process);
-
-	LOG_INF("START\n");
-
+ 	k_work_init(&pairing_work, pairing_process);
+#endif
+	
 //==================================================================================================================================================
 	while (1) 
 	{
