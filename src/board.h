@@ -72,7 +72,7 @@ extern const struct gpio_dt_spec dispbk;
 extern const struct gpio_dt_spec dispcs;
 extern const struct gpio_dt_spec dispdc;
 
-// #define     led_red_on()            gpio_pin_set_dt(&led_red,1);
+// #define     led_red_on()            gpio_pin_set_dt(&led_red,1);         //
 // #define     led_red_off()           gpio_pin_set_dt(&led_red,0);
 // #define     led_green_on()          gpio_pin_set_dt(&led_green,1);
 // #define     led_green_off()         gpio_pin_set_dt(&led_green,0);

@@ -2,9 +2,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
-#include "keyboard.h"
-#include "board.h"
-
 #include <zephyr/kernel.h>
 #include <zephyr/kernel_structs.h>
 #include <zephyr/device.h>
@@ -20,6 +17,10 @@
 
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
+
+#include "matrix_keyboard.h"
+#include "board.h"
+
 
 uint32_t key_pressed;
 

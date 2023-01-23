@@ -16,12 +16,15 @@
 #include <zephyr/settings/settings.h>
 
 #include <zephyr/drivers/led_strip.h>
+#include <zephyr/drivers/gpio.h>
 
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "board.h"
 #include "led_strip.h"
-#include "keyboard.h"
+#include "matrix_keyboard.h"
+#include "config_app.h"
 
 LOG_MODULE_REGISTER(my_bmk_led_strip,LOG_LEVEL_DBG);
 
@@ -109,23 +112,30 @@ int set_pattern_without_one_button(uint32_t position)
 //==================================================================================================================================================
 void thread_led_strip(void)
 {
-	// set_button_color(1,COLOR_WHITE);
-	// set_button_color(2,COLOR_RED);
-	// set_button_color(3,COLOR_GREEN);
-	// set_button_color(4,COLOR_BLUE);
-	// set_button_color(5,COLOR_YELLOW);
-	// set_button_color(6,COLOR_VIOLET);
-	// set_button_color(7,COLOR_TURQUOISE);
-	// set_button_color(8,COLOR_ORANGE);
-
-	//k_sleep(K_MSEC(3000));
-	
-	//set_button_pattern(gta_pattern);
-	//set_button_pattern_gta();
-	//set_button_color(4,COLOR_BLACK);
-
 	led_strip_init();
 	k_msleep(100);
+	vled_on();
+
+	#ifdef MAKE_LED_STRIP_TEST
+		for(int i=0;i<5;i++)
+		{
+			current_pattern = red_pattern;
+			set_button_pattern(current_pattern);
+			k_msleep(500);
+			current_pattern = green_pattern;
+			set_button_pattern(current_pattern);
+			k_msleep(500);
+			current_pattern = blue_pattern;
+			set_button_pattern(current_pattern);
+			k_msleep(500);
+		}
+
+		current_pattern = turn_off_pattern;
+		set_button_pattern(current_pattern);
+
+	#endif	
+
+
 	current_pattern = gta_pattern;
 	set_button_pattern(current_pattern);
  	

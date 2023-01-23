@@ -21,15 +21,15 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "config_app.h"
 #include "board.h"
 #include "led_pwm.h"
 #include "led_strip.h"
 
+
 #define LED_PWM_NODE_ID	 DT_COMPAT_GET_ANY_STATUS_OKAY(pwm_leds)
 
-const char *led_label[] = {
-	DT_FOREACH_CHILD_SEP_VARGS(LED_PWM_NODE_ID, DT_PROP_OR, (,), label, NULL)
-};
+const char *led_label[] = {DT_FOREACH_CHILD_SEP_VARGS(LED_PWM_NODE_ID, DT_PROP_OR, (,), label, NULL)};
 
 const int num_leds = ARRAY_SIZE(led_label);
 
@@ -37,33 +37,35 @@ LOG_MODULE_REGISTER(bmk_led_pwm,LOG_LEVEL_DBG);
 
 uint16_t level;
 
-
-		// err = led_on(led_pwm, 0);
-		// if (err < 0) { LOG_ERR("err=%d", err); return; }
-		// LOG_INF("Turned on");
-		// k_sleep(K_MSEC(1000));
-
-		// err = led_off(led_pwm, 0);
-		// if (err < 0) { LOG_ERR("err=%d", err); return; }
-		// LOG_INF("  Turned off");
-		// k_sleep(K_MSEC(1000));	
-
-
-
 //==================================================================================================================================================
 void thread_led_pwm(void)
 {
 	int err;
 	const struct device *led_pwm;
-	//uint8_t led;
 	
-	vled_on();
-
 	led_pwm = DEVICE_DT_GET(LED_PWM_NODE_ID);
 	if (!device_is_ready(led_pwm)) 
 	{
 		LOG_ERR("Device %s is not ready", led_pwm->name);
 	}
+
+	#ifdef MAKE_LED_PWM_TEST
+		for(int i=0;i<5;i++)
+		{
+			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
+			k_msleep(500);
+
+			err = led_off(led_pwm, LED_RED_PWM); 
+			err = led_set_brightness(led_pwm, LED_GREEN_PWM, 100);
+			k_msleep(500);
+
+			err = led_off(led_pwm, LED_GREEN_PWM); 
+			err = led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
+			k_msleep(500);
+
+			err = led_off(led_pwm, LED_BLUE_PWM); 
+		}
+	#endif
 
  	while(1)
  	{

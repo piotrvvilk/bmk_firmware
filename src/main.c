@@ -39,24 +39,23 @@
 #include "matrix_keyboard.h"
 #include "display.h"
 
+#define WORQ_THREAD_STACK_SIZE  			512
 
-#define WORQ_THREAD_STACK_SIZE  					512
+#define DEVICE_NAME     					CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN 					(sizeof(DEVICE_NAME) - 1)
 
-#define DEVICE_NAME     CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+#define BASE_USB_HID_SPEC_VERSION   		0x0101
 
-#define BASE_USB_HID_SPEC_VERSION   0x0101
+#define OUTPUT_REPORT_MAX_LEN            	1
+#define OUTPUT_REPORT_BIT_MASK_CAPS_LOCK 	0x02
+#define INPUT_REP_KEYS_REF_ID            	1
+#define OUTPUT_REP_KEYS_REF_ID           	1
+#define MODIFIER_KEY_POS                 	0
+#define SHIFT_KEY_CODE                   	0x02
+#define SCAN_CODE_POS                    	2
+#define KEYS_MAX_LEN                    	(INPUT_REPORT_KEYS_MAX_LEN - SCAN_CODE_POS)
 
-#define OUTPUT_REPORT_MAX_LEN            1
-#define OUTPUT_REPORT_BIT_MASK_CAPS_LOCK 0x02
-#define INPUT_REP_KEYS_REF_ID            1
-#define OUTPUT_REP_KEYS_REF_ID           1
-#define MODIFIER_KEY_POS                 0
-#define SHIFT_KEY_CODE                   0x02
-#define SCAN_CODE_POS                    2
-#define KEYS_MAX_LEN                    (INPUT_REPORT_KEYS_MAX_LEN - SCAN_CODE_POS)
-
-#define ADV_LED_BLINK_INTERVAL  1000
+#define ADV_LED_BLINK_INTERVAL  			1000
 
 /* Key used to accept or reject passkey value */
 #define KEY_PAIRING_ACCEPT DK_BTN1_MSK
@@ -992,7 +991,7 @@ static void bas_notify(void)
 // #endif
 // }
 //==================================================================================================================================================
-#ifdef USE_KEYBOARD
+#ifdef USE_MATRIX_KEYBOARD
 	K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
 #endif
 
