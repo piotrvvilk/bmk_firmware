@@ -89,7 +89,7 @@ extern const struct gpio_dt_spec dispdc;
 #define     charger_off()           gpio_pin_set_dt(&chrgen,0);
 
 #define     lcd_backlight_on()      gpio_pin_set_dt(&dispbk,1);
-#define     lcd_backlight_off()     gpio_pin_set_dt(&diskbk,0);
+#define     lcd_backlight_off()     gpio_pin_set_dt(&dispbk,0);
 
 #define     RST_H()                 gpio_pin_set_dt(&disprst,1);
 #define     RST_L()                 gpio_pin_set_dt(&disprst,0);

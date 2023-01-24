@@ -15,6 +15,7 @@ target_sources(app PRIVATE
   src/display.c
   src/lis2dh.c
   src/max17048.c
+  src/i2c_devices.c
   src/pictures/gta_picture.c
   src/pictures/vsc_picture.c
   src/pictures/altium_picture.c

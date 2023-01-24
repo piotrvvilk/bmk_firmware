@@ -24,7 +24,9 @@
 
 uint32_t key_pressed;
 
-LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
+#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+	LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
+#endif	
 
 //==================================================================================================================================================
 static uint32_t check_keyboard(void)
@@ -82,7 +84,9 @@ void thread_keyboard(void)
             {
                 key_pressed=0;
             }
-			LOG_INF("KEY: %d\n",key_pressed);
+			#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+				LOG_INF("KEY PRESSED: %d\n",key_pressed);
+			#endif
 		}
 
 		k_msleep(100);

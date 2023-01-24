@@ -74,8 +74,9 @@ int led_strip_init(void)
 //=================================================================================================================
 int set_button_color(uint8_t position, uint8_t color)
 {
-	position -= 1;
 	int rc;
+	
+	position-=1;
 	memcpy(&my_pix.pix[position], &colors[color], sizeof(struct led_rgb));
 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
     return rc;
@@ -84,8 +85,8 @@ int set_button_color(uint8_t position, uint8_t color)
 int set_button_pattern(const uint8_t *pattern)
 {
 	int rc;
+
 	memcpy(&my_pix.data, pattern, 40);
-	
 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
 	return rc;
 }
@@ -94,8 +95,8 @@ int set_button_pattern(const uint8_t *pattern)
 int turn_off_all_buttons(void)
 {
 	int rc;
+
 	memcpy(&my_pix.data, &turn_off_pattern, 40);
-	
 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
 	return rc;
 }
@@ -104,19 +105,22 @@ int turn_off_all_buttons(void)
 int set_pattern_without_one_button(uint32_t position)
 {
 	int rc;
+
 	memcpy(&my_pix.pix[position-1], &colors[COLOR_BLACK], sizeof(struct led_rgb));
 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
 	return rc;
 }
 
-//==================================================================================================================================================
+//=================================================================================================================
 void thread_led_strip(void)
 {
 	led_strip_init();
 	k_msleep(100);
 	vled_on();
+	k_msleep(250);
 
-	#ifdef MAKE_LED_STRIP_TEST
+//---------------------------------------------------------------------------------- led test
+	#ifdef MAKE_LED_STRIP_TEST														 
 		for(int i=0;i<5;i++)
 		{
 			current_pattern = red_pattern;
@@ -134,18 +138,18 @@ void thread_led_strip(void)
 		set_button_pattern(current_pattern);
 
 	#endif	
+//----------------------------------------------------------------------------------
 
-
-	current_pattern = gta_pattern;
-	set_button_pattern(current_pattern);
+	//current_pattern = gta_pattern;
+	set_button_pattern(gta_pattern);
  	
 	while(1)
  	{
-		if(key_pressed!=0)
+		if(key_pressed!=0)															//key pressed
 		{
 			if(key_pressed==1)
 			{
-				LOG_INF("LED_KEY: %d\n",key_pressed);
+				LOG_INF("LED_KEY: %d\n",key_pressed);								//next mode
 				mode_counter--;
 				if(mode_counter<0) mode_counter=MODE_VSC;		
 				{
@@ -174,7 +178,7 @@ void thread_led_strip(void)
 
 			else if(key_pressed==3)
 			{
-				LOG_INF("LED_KEY: %d\n",key_pressed);
+				LOG_INF("LED_KEY: %d\n",key_pressed);								//previous mode
 				mode_counter++;
 				if(mode_counter>MODE_VSC) mode_counter=MODE_GTA;		
 				{
@@ -200,15 +204,13 @@ void thread_led_strip(void)
 				set_button_pattern(current_pattern);
 				key_pressed=0;
 			}
-
-			else if((key_pressed!=1)&&(key_pressed!=3))
+			else if((key_pressed!=1)&&(key_pressed!=3))								//macro buttons
 			{
 				set_pattern_without_one_button(key_pressed);
 				k_msleep(250);
 				set_button_pattern(current_pattern);
 				key_pressed=0;
 			}
-
 		}
 
 		k_msleep(100);
@@ -216,4 +218,4 @@ void thread_led_strip(void)
 		
 }
 
-//==================================================================================================================================================
+//=================================================================================================================

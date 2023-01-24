@@ -1,4 +1,3 @@
-
 #ifndef CONFIG_APP_H__
 #define CONFIG_APP_H__
 
@@ -25,6 +24,14 @@
 #ifdef          MAKE_TEST
     #define     MAKE_LED_PWM_TEST               1 
     #define     MAKE_LED_STRIP_TEST             1 
+#endif
+
+//======================================================= APPLICATION DEBUG LOGGER
+#define         DEBUG_LOG_APP                   1
+#ifdef          DEBUG_LOG_APP                     
+    #define     DEBUG_LOG_MATRIX_KEYBOARD       1
+    #define     DEBUG_LOG_LED_PWM               1
+    #define     DEBUG_LOG_I2C_DEVICES           1
 #endif
 
 //======================================================= 

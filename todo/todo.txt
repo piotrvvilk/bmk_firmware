@@ -1,0 +1,37 @@
+
+//*******************************************************
+//******                                            *****		
+//******                                            *****		
+//****** MY FIRST BLUETOOTH ZEPHYR PROJECT :)       *****
+//****** BMK - BLUETOOTH MACRO KEYPAD               *****
+//******                                            *****
+//******                                            *****			
+//****** HARDWARE: BMK Rev.1.1                      *****
+//******                                            *****
+//******                                            *****
+//****** nRF Connect SDK 2.2.0                      *****		
+//******                                            *****		
+//******                                            *****		
+//*******************************************************
+
+//-------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------  TO DO  -----------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------
+
+- dobrac ilosc pamieci do watkow,
+- ikonki baterii i bluetooth,
+- define dla komend loggera,
+- rtt - pobor pradu,
+- detekcja USB,
+- detekcja i obsluga ladowarki,
+- nowe bitmapy,
+- akcelerometr i zaswiecania ledow/lcd,
+- timer do ledow i lcd, obsluga zasilania ledow,
+- ujednolicic gdzie sie da kody bledow,
+- wprowadzic obsluge bledow,
+
+- konfiguracja: 
+  * swieci na stale albo na ruch/klawisz
+
+  
+//-------------------------------------------------------------------------------------------------------------------------------

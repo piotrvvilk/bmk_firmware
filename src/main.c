@@ -38,6 +38,7 @@
 #include "led_pwm.h"
 #include "matrix_keyboard.h"
 #include "display.h"
+#include "i2c_devices.h"
 
 #define WORQ_THREAD_STACK_SIZE  			512
 
@@ -991,6 +992,8 @@ static void bas_notify(void)
 // #endif
 // }
 //==================================================================================================================================================
+//============================================================   THREADS   =========================================================================
+//==================================================================================================================================================
 #ifdef USE_MATRIX_KEYBOARD
 	K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
 #endif
@@ -1007,13 +1010,17 @@ static void bas_notify(void)
 	K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
 #endif
 
+#ifdef USE_I2C_DEVICES
+	K_THREAD_DEFINE(thread_i2c_devices_id, THREAD_I2C_DEVICES_STACKSIZE, thread_i2c_devices, NULL, NULL, NULL, THREAD_I2C_DEVICES_PRIORITY, 0, 0);
+#endif
+
 //==================================================================================================================================================
-//==================================================================================================================================================
+//===========================================================   MAIN LOOP   ========================================================================
 //==================================================================================================================================================
 void main(void)
 {
 	int err;
-	LOG_INF("Starting Bluetooth Peripheral PWS example\n");
+	LOG_INF("START BMK DEVICE\n");
 	LOG_INF("%s",string_version);
 	LOG_INF("%s",string_date);
 
@@ -1066,6 +1073,9 @@ void main(void)
 //==================================================================================================================================================
 	while (1) 
 	{
+
+
+
 		k_sleep(K_MSEC(100));
     }
 	

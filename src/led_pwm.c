@@ -49,6 +49,7 @@ void thread_led_pwm(void)
 		LOG_ERR("Device %s is not ready", led_pwm->name);
 	}
 
+//---------------------------------------------------------------------------------- led test
 	#ifdef MAKE_LED_PWM_TEST
 		for(int i=0;i<5;i++)
 		{
@@ -66,13 +67,14 @@ void thread_led_pwm(void)
 			err = led_off(led_pwm, LED_BLUE_PWM); 
 		}
 	#endif
+//---------------------------------------------------------------------------------- 	
 
  	while(1)
  	{
 		if(mode_counter==MODE_GTA)
 		{
 			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
-			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }		//i co dalej jak blad?
 
 			err = led_off(led_pwm, LED_GREEN_PWM); 
 			if (err < 0) { LOG_ERR("err=%d", err); }
@@ -110,7 +112,5 @@ void thread_led_pwm(void)
 	}
 		
 }
-
-
 
 //==================================================================================================================================================

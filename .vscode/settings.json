@@ -23,7 +23,8 @@
         "lvgl.h": "c",
         "lv_api_map.h": "c",
         "lvgl_sample.h": "c",
-        "config_app.h": "c"
+        "config_app.h": "c",
+        "log.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "nrf-connect.debugging.bindings": {
