@@ -23,8 +23,10 @@
 
 #include "config_app.h"
 #include "board.h"
+#include "main.h"
 #include "led_pwm.h"
 #include "led_strip.h"
+#include "matrix_keyboard.h"
 
 
 #define LED_PWM_NODE_ID	 DT_COMPAT_GET_ANY_STATUS_OKAY(pwm_leds)
@@ -36,6 +38,7 @@ const int num_leds = ARRAY_SIZE(led_label);
 LOG_MODULE_REGISTER(bmk_led_pwm,LOG_LEVEL_DBG);
 
 uint16_t level;
+uint8_t led_pwm_theme;
 
 //==================================================================================================================================================
 void thread_led_pwm(void)
@@ -71,43 +74,65 @@ void thread_led_pwm(void)
 
  	while(1)
  	{
-		if(mode_counter==MODE_GTA)
+		if(device_theme!=led_pwm_theme)
 		{
-			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
-			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }		//i co dalej jak blad?
+			if(device_theme==MODE_GTA)
+			{
+				led_pwm_theme=device_theme;
 
-			err = led_off(led_pwm, LED_GREEN_PWM); 
-			if (err < 0) { LOG_ERR("err=%d", err); }
+				err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }		//i co dalej jak blad?
 
-			err = led_off(led_pwm, LED_BLUE_PWM); 
-			if (err < 0) { LOG_ERR("err=%d", err); }
+				err = led_off(led_pwm, LED_GREEN_PWM); 
+				if (err < 0) { LOG_ERR("err=%d", err); }
+
+				err = led_off(led_pwm, LED_BLUE_PWM); 
+				if (err < 0) { LOG_ERR("err=%d", err); }
+			}
+
+			if(device_theme==MODE_ALTIUM)
+			{
+				led_pwm_theme=device_theme;
+
+				err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+
+				err = led_set_brightness(led_pwm, LED_GREEN_PWM, 5);
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 50); }
+
+				err = led_off(led_pwm, LED_BLUE_PWM); 
+				if (err < 0) { LOG_ERR("err=%d", err); }
+			}
+
+			if(device_theme==MODE_VSC)
+			{
+				led_pwm_theme=device_theme;
+
+				err = led_off(led_pwm, LED_RED_PWM); 
+				if (err < 0) { LOG_ERR("err=%d", err); }
+
+				err = led_off(led_pwm, LED_GREEN_PWM); 
+				if (err < 0) { LOG_ERR("err=%d", err); }
+
+				err = led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+			}
+
+			if(device_theme==MODE_INFO)
+			{
+				led_pwm_theme=device_theme;
+
+				err = led_set_brightness(led_pwm, LED_RED_PWM, 80);
+				if (err < 0) { LOG_ERR("err=%d", err); }
+
+				err = led_set_brightness(led_pwm, LED_GREEN_PWM, 80);
+				if (err < 0) { LOG_ERR("err=%d", err); }
+
+				err = led_set_brightness(led_pwm, LED_BLUE_PWM, 80);
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
+			}
+
 		}
-
-		if(mode_counter==MODE_ALTIUM)
-		{
-			err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
-			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
-
-			err = led_set_brightness(led_pwm, LED_GREEN_PWM, 5);
-			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 50); }
-
-			err = led_off(led_pwm, LED_BLUE_PWM); 
-			if (err < 0) { LOG_ERR("err=%d", err); }
-		}
-
-		if(mode_counter==MODE_VSC)
-		{
-			err = led_off(led_pwm, LED_RED_PWM); 
-			if (err < 0) { LOG_ERR("err=%d", err); }
-
-			err = led_off(led_pwm, LED_GREEN_PWM); 
-			if (err < 0) { LOG_ERR("err=%d", err); }
-
-			err = led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
-			if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
-
-		}
-
 		k_msleep(100);
 	}
 		

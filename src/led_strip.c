@@ -1,4 +1,3 @@
-
 #include <stddef.h>
 #include <string.h>
 #include <errno.h>
@@ -22,6 +21,7 @@
 #include <zephyr/logging/log.h>
 
 #include "board.h"
+#include "main.h"
 #include "led_strip.h"
 #include "matrix_keyboard.h"
 #include "config_app.h"
@@ -54,9 +54,10 @@ union Pat{
 	uint8_t data[4*STRIP_NUM_PIXELS];
 };
 
+uint8_t led_strip_theme;
 static union Pat my_pix;						     						//led strip buffer
 const uint8_t *current_pattern;												//pointer to current led strip pattern
-int8_t mode_counter=MODE_GTA;												//mode counter
+
 
 //=================================================================================================================
 int led_strip_init(void)
@@ -140,21 +141,20 @@ void thread_led_strip(void)
 	#endif	
 //----------------------------------------------------------------------------------
 
-	//current_pattern = gta_pattern;
-	set_button_pattern(gta_pattern);
+	set_button_pattern(info_pattern);
  	
 	while(1)
  	{
-		if(key_pressed!=0)															//key pressed
+		if(key_pressed!=0)															//change mode pressed (1 or 3)
 		{
-			if(key_pressed==1)
+			if((key_pressed==1)||(key_pressed==3))
 			{
-				LOG_INF("LED_KEY: %d\n",key_pressed);								//next mode
-				mode_counter--;
-				if(mode_counter<0) mode_counter=MODE_VSC;		
+				LOG_INF("LED_KEY: %d\n",key_pressed);								
+				switch(device_theme)
 				{
-					switch(mode_counter)
-					{
+					case MODE_INFO:
+						current_pattern = info_pattern;		
+						break;
 					case MODE_GTA:
 						current_pattern = gta_pattern;		
 						break;
@@ -164,10 +164,10 @@ void thread_led_strip(void)
 					case MODE_VSC:
 						current_pattern = vsc_pattern;		
 						break;
+
 					default:
 						break;
-					}		
-				}
+				}		
 
     			set_button_pattern(current_pattern);
 				set_pattern_without_one_button(key_pressed);
@@ -175,36 +175,7 @@ void thread_led_strip(void)
 				set_button_pattern(current_pattern);
 				key_pressed=0;
 			}
-
-			else if(key_pressed==3)
-			{
-				LOG_INF("LED_KEY: %d\n",key_pressed);								//previous mode
-				mode_counter++;
-				if(mode_counter>MODE_VSC) mode_counter=MODE_GTA;		
-				{
-					switch (mode_counter)
-					{
-					case MODE_GTA:
-						current_pattern = gta_pattern;		
-						break;
-					case MODE_ALTIUM:
-						current_pattern = altium_pattern;		
-						break;
-					case MODE_VSC:
-						current_pattern = vsc_pattern;		
-						break;
-					default:
-						break;
-					}		
-				}
-
-    			set_button_pattern(current_pattern);
-				set_pattern_without_one_button(key_pressed);
-				k_msleep(250);
-				set_button_pattern(current_pattern);
-				key_pressed=0;
-			}
-			else if((key_pressed!=1)&&(key_pressed!=3))								//macro buttons
+			else 																	//macro buttons
 			{
 				set_pattern_without_one_button(key_pressed);
 				k_msleep(250);

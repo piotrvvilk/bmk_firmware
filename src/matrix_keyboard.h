@@ -5,6 +5,7 @@
 #define THREAD_KEYBOARD_STACKSIZE       			128
 
 extern uint32_t key_pressed;
+extern uint8_t device_theme;
 
 void thread_keyboard(void);
 
