@@ -34,11 +34,11 @@
 #include "board.h"
 #include "common.h"
 #include "version.h"
-#include "led_strip.h"
-#include "led_pwm.h"
+#include "led.h"
 #include "matrix_keyboard.h"
 #include "display.h"
 #include "i2c_devices.h"
+#include "lis2dh.h"
 
 #define WORQ_THREAD_STACK_SIZE  			512
 
@@ -110,7 +110,7 @@ enum {
 	INPUT_REP_KEYS_IDX = 0
 };
 
-LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(my_bmk_main,LOG_LEVEL_DBG);
 
 /* HIDS instance. */
 BT_HIDS_DEF(hids_obj, OUTPUT_REPORT_MAX_LEN, INPUT_REPORT_KEYS_MAX_LEN);
@@ -170,6 +170,8 @@ K_MSGQ_DEFINE(mitm_queue,
 	      sizeof(struct pairing_data_mitm),
 	      CONFIG_BT_HIDS_MAX_CLIENT_COUNT,
 	      4);
+
+uint32_t     device_active_counter;		  
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -998,19 +1000,15 @@ static void bas_notify(void)
 	K_THREAD_DEFINE(thread_keyboard_id, THREAD_KEYBOARD_STACKSIZE, thread_keyboard, NULL, NULL, NULL, THREAD_KEYBOARD_PRIORITY, 0, 0);
 #endif
 
-#ifdef USE_LED_PWM
-	K_THREAD_DEFINE(thread_led_pwm_id, THREAD_LED_PWM_STACKSIZE, thread_led_pwm, NULL, NULL, NULL, THREAD_LED_PWM_PRIORITY, 0, 0);
+#ifdef USE_LED
+	K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NULL, THREAD_LED_PRIORITY, 0, 0);
 #endif 
-
-#ifdef USE_LED_STRIP
-	K_THREAD_DEFINE(thread_led_strip_id, THREAD_LED_STRIP_STACKSIZE, thread_led_strip, NULL, NULL, NULL, THREAD_LED_STRIP_PRIORITY, 0, 0);
-#endif
 
 #ifdef USE_DISPLAY
 	K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
 #endif
 
-#ifdef USE_I2C_DEVICES
+#if defined(USE_LIS2DH) || defined(USE_MAX17048)
 	K_THREAD_DEFINE(thread_i2c_devices_id, THREAD_I2C_DEVICES_STACKSIZE, thread_i2c_devices, NULL, NULL, NULL, THREAD_I2C_DEVICES_PRIORITY, 0, 0);
 #endif
 
@@ -1020,6 +1018,8 @@ static void bas_notify(void)
 void main(void)
 {
 	int err;
+
+
 	LOG_INF("START BMK DEVICE\n");
 	LOG_INF("%s",string_version);
 	LOG_INF("%s",string_date);
@@ -1073,10 +1073,28 @@ void main(void)
 //==================================================================================================================================================
 	while (1) 
 	{
+		if(lis_int1_flag)
+		{
+			lis_int1_flag=false;
+			release_interrupt();		
+			device_active_counter=0;
+			
+			if(device_theme=NO_THEME)
+			{
+				device_theme = last_theme;
+			}
+		}	
+
+		device_active_counter++;
+		if(device_active_counter>15)					//timeout - display and led power off
+		{
+			device_active_counter=0;
+			last_theme=device_theme;					//remember last theme 
+			device_theme=NO_THEME;						//turn off display, led strip and led pwm
+		}
 
 
-
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(1000));
     }
 	
 }

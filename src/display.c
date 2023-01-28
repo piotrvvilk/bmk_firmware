@@ -23,11 +23,14 @@
 
 #include "board.h"
 #include "display.h"
+#include "main.h"
+#include "matrix_keyboard.h"
 #include "config_app.h"
 
 const struct device *display_dev;
 
 uint32_t lcd_tmp=10;
+uint8_t display_theme;
 
 size_t cursor = 0, color = 0;
 int rc;
@@ -38,7 +41,9 @@ LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 void thread_lcd(void)
 {
 	#ifdef USE_DISPLAY
+		
 		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+
 		if (!device_is_ready(display_dev)) {
 			LOG_ERR("Device not ready, aborting test");
 			return;
@@ -54,20 +59,84 @@ void thread_lcd(void)
 		// lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
 		// lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
-		LV_IMG_DECLARE(gta_online);
+		LV_IMG_DECLARE(logo);
 		lv_obj_t * img1 = lv_img_create(lv_scr_act());
-		lv_img_set_src(img1, &gta_online);
+		lv_img_set_src(img1, &logo);
 		lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 		lv_obj_set_size(img1, 240, 160);
 		lv_task_handler();
 		display_blanking_off(display_dev);
-    #endif
-
-    while(1)
-    {
     
-        k_msleep(100);
-    }
+		while(1)
+		{
+			if(device_theme!=display_theme)
+			{
+				if(device_theme==THEME_GTA)
+				{
+					display_theme=device_theme;
+					LV_IMG_DECLARE(gta);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &gta);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
+
+				if(device_theme==THEME_ALTIUM)
+				{
+					display_theme=device_theme;
+					LV_IMG_DECLARE(altium);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &altium);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
+
+
+				if(device_theme==THEME_VSC)
+				{
+					display_theme=device_theme;
+					LV_IMG_DECLARE(vsc);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &vsc);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
+
+
+				if(device_theme==THEME_INFO)
+				{
+					display_theme=device_theme;
+					LV_IMG_DECLARE(logo);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &logo);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
+
+				if(device_theme==NO_THEME)
+				{
+					lcd_backlight_off();
+					display_theme=device_theme;
+					
+				}
+			}
+
+			k_msleep(100);
+		}
+
+	#endif
 	
 }
 

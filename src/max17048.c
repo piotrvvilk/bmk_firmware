@@ -12,7 +12,7 @@
 
 #include "max17048.h"
 
-const struct device *const i2c_max17048_dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
+const struct device *const i2c_max17048_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
 // //==================================================================================================================================================
 // static int i2c_write_reg(uint8_t addr, uint8_t data)

@@ -19,12 +19,18 @@
 #include <zephyr/logging/log.h>
 
 #include "matrix_keyboard.h"
+#include "config_app.h"
 #include "board.h"
 #include "main.h"
 
 
-uint32_t 	key_pressed;
-uint8_t 	device_theme=MODE_INFO;									//color, display, pwm_led, led_strip
+static uint32_t 	key_pressed;
+uint32_t			led_key_pressed;
+
+uint8_t 			device_theme=THEME_INFO;									//color, display, pwm_led, led_strip
+uint8_t				last_theme;
+static uint32_t		keyboard_blocked;
+static uint32_t		key_unlock_counter;
 
 #ifdef DEBUG_LOG_MATRIX_KEYBOARD
 	LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
@@ -78,35 +84,53 @@ void thread_keyboard(void)
 {
 	while(1)
 	{
-		key_pressed = check_keyboard();																	//key_pressed is deleted after led_strip procces
-		if(key_pressed!=0)
+		key_pressed = check_keyboard();															//read keyboard										
+		
+		if(keyboard_blocked==0)																	//if keyboard not blocked
 		{
-			k_msleep(20);
-			key_pressed = check_keyboard();
 			if(key_pressed!=0)
 			{
-				if(key_pressed==1)														
+				k_msleep(2);
+				key_pressed = check_keyboard();													//key detected
+				if(key_pressed!=0)
 				{
-					device_theme++;
-					if(device_theme>MODE_LAST) device_theme=MODE_FIRST;
+					led_key_pressed=key_pressed;												//led blink 
+					keyboard_blocked=1;															//keyboard locked
+					if(key_pressed==1)															//next theme											
+					{
+						device_theme++;
+						if(device_theme>THEME_LAST) device_theme=THEME_FIRST;
+					}
+
+					if(key_pressed==3)															//previous theme
+					{
+						device_theme--;
+						if(device_theme<THEME_FIRST) device_theme=THEME_LAST;		
+					}
+				}
+				else																			//to short key pressed 
+				{
+					key_pressed=0;
+					led_key_pressed=key_pressed;
 				}
 
-				if(key_pressed==3)
-				{
-					device_theme--;
-					if(device_theme<MODE_FIRST) device_theme=MODE_LAST;
-				}
+				#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+						LOG_INF("KEY PRESSED: %d\n",key_pressed);
+				#endif
 			}
-			else
-			{
-				key_pressed=0;
-			}
-
-			#ifdef DEBUG_LOG_MATRIX_KEYBOARD
-				LOG_INF("KEY PRESSED: %d\n",key_pressed);
-			#endif
 		}
-		k_msleep(100);
+
+		if(key_pressed==0)																		//if key not pressed	
+		{
+		  	key_unlock_counter++;
+			if(key_unlock_counter>1)
+			{
+				key_unlock_counter=0;
+				keyboard_blocked=0;																//keyboard unlocked
+			}
+			
+		}
+		k_msleep(50);
 	}
 
 }

@@ -1,5 +1,5 @@
-#ifndef __LIS2DH_H
-#define __LIS2DH_H
+#ifndef LIS2DH_H__
+#define LIS2DH_H__
 
 //==================================================================================== 
 extern int16_t x_axis, y_axis, z_axis;
@@ -66,7 +66,7 @@ extern bool lis_int1_flag;
 #define		LIS2DH_ACT_DUR					0x3F
 
 //============================================================================ 
-void i2c_init(void);
+uint32_t i2c_init(void);
 uint8_t get_accel_ID(void);
 int8_t get_accel_temp(void);
 void release_interrupt(void);

@@ -10,8 +10,7 @@ target_sources(app PRIVATE
   src/board.c
   src/version.c
   src/matrix_keyboard.c
-  src/led_pwm.c
-  src/led_strip.c
+  src/led.c
   src/display.c
   src/lis2dh.c
   src/max17048.c
@@ -19,4 +18,5 @@ target_sources(app PRIVATE
   src/pictures/gta_picture.c
   src/pictures/vsc_picture.c
   src/pictures/altium_picture.c
+  src/pictures/logo_picture.c
 )

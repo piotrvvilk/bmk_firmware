@@ -1,5 +1,5 @@
-#ifndef LED_STRIP_H__
-#define LED_STRIP_H__
+#ifndef LED_H__
+#define LED_H__
 
 #define		COLOR_WHITE		    			1
 #define		COLOR_RED		    			2
@@ -11,8 +11,16 @@
 #define		COLOR_TURQUOISE	    			7
 #define		COLOR_ORANGE	    			8
 
-#define 	THREAD_LED_STRIP_PRIORITY 		7
-#define 	THREAD_LED_STRIP_STACKSIZE  	512
+#define 	THREAD_LED_PRIORITY 			7
+#define 	THREAD_LED_STACKSIZE  			512
+
+#define     LED_RED_PWM                     0
+#define     LED_GREEN_PWM                   1
+#define     LED_BLUE_PWM                    2
+
+#define     MAX_BRIGHTNESS	                100
+#define     FADE_DELAY_MS	                10
+#define     FADE_DELAY	                    K_MSEC(FADE_DELAY_MS)
 
 
 static const uint8_t info_pattern[40] =    {0x00, 0x20, 0x2F, 0x2F, 
@@ -111,7 +119,7 @@ int set_button_pattern(const uint8_t *pattern);
 int turn_off_all_buttons(void);
 int set_pattern_without_one_button(uint32_t position);
 
-void thread_led_strip(void);
+void thread_led(void);
 
 
 #endif

@@ -10,6 +10,8 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "common.h"
+#include "config_app.h"
 #include "lis2dh.h"
 
 //---------------------------------------------------------------------------
@@ -24,8 +26,11 @@ bool 			lis_int1_flag;
 //float angle_x,angle_y,angle_z;
 //uint32_t res;
 
-const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
-LOG_MODULE_REGISTER(my_bmk_lis,LOG_LEVEL_DBG);
+const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
+
+#ifdef DEBUG_LOG_LIS2DH  
+	LOG_MODULE_REGISTER(my_bmk_lis,LOG_LEVEL_DBG);
+#endif	
 
 //==================================================================================================================================================
 static int lis2dh_write_reg(uint8_t addr, uint8_t data)
@@ -70,12 +75,18 @@ static int lis2dh_read_reg(uint16_t addr, uint8_t *data)
 }
 
 //==================================================================================================================================================
-void i2c_init(void)
+uint32_t i2c_init(void)
 {
 	if (!device_is_ready(i2c_dev)) 
 	{
-		LOG_INF("I2C: Device is not ready.\n");
-		return;
+		#ifdef DEBUG_LOG_LIS2DH
+			LOG_INF("I2C: Device is not ready.\n");
+		#endif
+		return BUSY;
+	}
+	else
+	{
+		return RESULT_OK;
 	}
 }
 
