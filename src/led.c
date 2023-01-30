@@ -151,7 +151,7 @@ void thread_led(void)
 	led_strip_init();
 	k_msleep(100);
 	vled_on();
-	k_msleep(250);
+	k_msleep(100);
 
 //---------------------------------------------------------------------------------- led pwm test
 	#ifdef MAKE_LED_PWM_TEST
@@ -202,12 +202,14 @@ void thread_led(void)
 		{
 			if(device_theme==THEME_GTA)
 			{
-				led_theme=device_theme;
-				current_pattern = gta_pattern;	
-				set_button_pattern(current_pattern);
+				vled_on()																//led power on
+				k_msleep(20);															//wait to led inside driver
+				led_theme=device_theme;													//don't repeat this condition all the time 
+				current_pattern = gta_pattern;											//set current theme		
+				set_button_pattern(current_pattern);									//turn on led strip
 
-				err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
-				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }		//i co dalej jak blad?
+				err = led_set_brightness(led_pwm, LED_RED_PWM, 100);					//set appropriate PWM LED PCB bottom
+				if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }			//QUESTION: WHAT SHOULD I DO WITH EER?
 
 				err = led_off(led_pwm, LED_GREEN_PWM); 
 				if (err < 0) { LOG_ERR("err=%d", err); }
@@ -216,8 +218,10 @@ void thread_led(void)
 				if (err < 0) { LOG_ERR("err=%d", err); }
 			}
 
-			if(device_theme==THEME_ALTIUM)
+			if(device_theme==THEME_ALTIUM)												//another theme 
 			{
+				vled_on()
+				k_msleep(20);
 				led_theme=device_theme;
 				current_pattern = altium_pattern;
 				set_button_pattern(current_pattern);	
@@ -234,6 +238,8 @@ void thread_led(void)
 
 			if(device_theme==THEME_VSC)
 			{
+				vled_on()
+				k_msleep(20);
 				led_theme=device_theme;
 				current_pattern = vsc_pattern;	
 				set_button_pattern(current_pattern);
@@ -250,6 +256,8 @@ void thread_led(void)
 
 			if(device_theme==THEME_INFO)
 			{
+				vled_on()
+				k_msleep(20);
 				led_theme=device_theme;
 				current_pattern = info_pattern;	
 				set_button_pattern(current_pattern);
@@ -278,16 +286,17 @@ void thread_led(void)
 				
 				err = led_off(led_pwm, LED_BLUE_PWM); 
 				if (err < 0) { LOG_ERR("err=%d", err); }
+				vled_off()
 			}
 
 		}
 
-		if(led_key_pressed!=0)
+		if(led_key_pressed!=0)															//if key pressed
 		{
-			set_pattern_without_one_button(led_key_pressed);
+			set_pattern_without_one_button(led_key_pressed);							//turn off pressed key
 			k_msleep(250);
-			set_button_pattern(current_pattern);
-			led_key_pressed=0;
+			set_button_pattern(current_pattern);										//turn on 
+			led_key_pressed=0;															//reset flag
 		}
 
 		k_msleep(50);

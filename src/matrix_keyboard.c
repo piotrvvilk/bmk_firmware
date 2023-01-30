@@ -94,6 +94,7 @@ void thread_keyboard(void)
 				key_pressed = check_keyboard();													//key detected
 				if(key_pressed!=0)
 				{
+					device_active_time_reset();													//reset standby counter	
 					led_key_pressed=key_pressed;												//led blink 
 					keyboard_blocked=1;															//keyboard locked
 					if(key_pressed==1)															//next theme											

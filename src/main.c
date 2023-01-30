@@ -993,6 +993,19 @@ static void bas_notify(void)
 // 	}
 // #endif
 // }
+
+//==================================================================================================================================================
+void device_active_time_reset(void)								//start counting time to standby led and display
+{
+	device_active_counter=1;
+}
+
+//==================================================================================================================================================
+void device_active_time_stop(void)								//stop counting 
+{
+	device_active_counter=0;
+}
+
 //==================================================================================================================================================
 //============================================================   THREADS   =========================================================================
 //==================================================================================================================================================
@@ -1019,10 +1032,9 @@ void main(void)
 {
 	int err;
 
-
 	LOG_INF("START BMK DEVICE\n");
-	LOG_INF("%s",string_version);
-	LOG_INF("%s",string_date);
+	LOG_INF("%s\n",string_version);
+	LOG_INF("%s\n",string_date);
 
 //-------------------------------------------------------------------------- GPIO
 	err = gpio_init();
@@ -1077,24 +1089,27 @@ void main(void)
 		{
 			lis_int1_flag=false;
 			release_interrupt();		
-			device_active_counter=0;
+			device_active_time_reset();							//start counting
 			
-			if(device_theme=NO_THEME)
+			if(device_theme==NO_THEME)							//restore last theme
 			{
 				device_theme = last_theme;
 			}
 		}	
 
-		device_active_counter++;
-		if(device_active_counter>15)					//timeout - display and led power off
+		if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
+
+		if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
 		{
-			device_active_counter=0;
-			last_theme=device_theme;					//remember last theme 
-			device_theme=NO_THEME;						//turn off display, led strip and led pwm
+			device_active_time_stop();
+			last_theme=device_theme;							//remember last theme 
+			device_theme=NO_THEME;								//turn off display, led strip and led pwm
+			#ifdef DEBUG_LOG_DEVICE
+				LOG_INF("Timeout\n");		
+			#endif
 		}
 
-
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(100));
     }
 	
 }
