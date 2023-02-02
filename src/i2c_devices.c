@@ -19,8 +19,8 @@
 #include <zephyr/logging/log.h>
 
 #include "i2c_devices.h"
-#include "lis2dh.h"
-#include "max17048.h"
+#include "lis2dh/lis2dh.h"
+#include "max17048/max17048.h"
 #include "board.h"
 #include "main.h"
 #include "config_app.h"

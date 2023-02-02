@@ -21,6 +21,7 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "version.h"
 #include "board.h"
 #include "display.h"
 #include "main.h"
@@ -41,7 +42,11 @@ LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 void thread_lcd(void)
 {
 	#ifdef USE_DISPLAY
-		
+
+	lv_obj_t * label1 = lv_label_create(lv_scr_act());
+	lv_obj_t * label2 = lv_label_create(lv_scr_act());
+	lv_obj_t * img1 = lv_img_create(lv_scr_act());			
+
 		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
 		if (!device_is_ready(display_dev)) {
@@ -52,15 +57,8 @@ void thread_lcd(void)
 			
 		lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-		// // /*Create a white label, set its text and align it to the center*/
-		// lv_obj_t * label = lv_label_create(lv_scr_act());
-		// lv_label_set_text(label, "Hello world");
-		// //lv_label_set_text_font(label, &LV_FONT_MONTSERRAT_20);
-		// lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-		// lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
 		LV_IMG_DECLARE(logo);
-		lv_obj_t * img1 = lv_img_create(lv_scr_act());
+		//lv_obj_t * img1 = lv_img_create(lv_scr_act());
 		lv_img_set_src(img1, &logo);
 		lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 		lv_obj_set_size(img1, 240, 160);
@@ -75,10 +73,10 @@ void thread_lcd(void)
 				{
 					display_theme=device_theme;
 					LV_IMG_DECLARE(gta);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+		//			lv_obj_t * img1 = lv_img_create(lv_scr_act());
 					lv_img_set_src(img1, &gta);
 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-					lv_obj_set_size(img1, 220, 160);
+					lv_obj_set_size(img1, 320, 190);
 					lv_task_handler();
 					display_blanking_off(display_dev);
 					lcd_backlight_on();
@@ -87,8 +85,9 @@ void thread_lcd(void)
 				if(device_theme==THEME_ALTIUM)
 				{
 					display_theme=device_theme;
+					lv_obj_clean(lv_scr_act());
 					LV_IMG_DECLARE(altium);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+				//	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 					lv_img_set_src(img1, &altium);
 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 					lv_obj_set_size(img1, 220, 160);
@@ -101,8 +100,9 @@ void thread_lcd(void)
 				if(device_theme==THEME_VSC)
 				{
 					display_theme=device_theme;
+					lv_obj_clean(lv_scr_act());
 					LV_IMG_DECLARE(vsc);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+				//	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 					lv_img_set_src(img1, &vsc);
 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 					lv_obj_set_size(img1, 220, 160);
@@ -115,13 +115,31 @@ void thread_lcd(void)
 				if(device_theme==THEME_INFO)
 				{
 					display_theme=device_theme;
+					lv_obj_clean(lv_scr_act());
 					LV_IMG_DECLARE(logo);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+				//	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 					lv_img_set_src(img1, &logo);
-					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-					lv_obj_set_size(img1, 220, 160);
+					lv_obj_align(img1, LV_ALIGN_CENTER, -100, 0);
+					lv_obj_set_size(img1, 128, 128);
+					//lv_task_handler();
+					//display_blanking_off(display_dev);
+					
+					LV_IMG_DECLARE(ble);
+					img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &ble);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 120, 50);
+					lv_obj_set_size(img1, 32, 40);
+
+					lv_label_set_text(label1, STR_VER);
+					lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+					lv_obj_align(label1, LV_ALIGN_CENTER, 0, 10);
+					lv_label_set_text(label2, STR_DATE);
+					lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+					lv_obj_align(label2, LV_ALIGN_CENTER, 0, 40);
+
 					lv_task_handler();
 					display_blanking_off(display_dev);
+					
 					lcd_backlight_on();
 				}
 

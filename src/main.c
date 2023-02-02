@@ -38,7 +38,7 @@
 #include "matrix_keyboard.h"
 #include "display.h"
 #include "i2c_devices.h"
-#include "lis2dh.h"
+#include "lis2dh/lis2dh.h"
 
 #define WORQ_THREAD_STACK_SIZE  			512
 
@@ -995,7 +995,7 @@ static void bas_notify(void)
 // }
 
 //==================================================================================================================================================
-void device_active_time_reset(void)								//start counting time to standby led and display
+void device_active_time_reset(void)								//start counting time to standby 
 {
 	device_active_counter=1;
 }
@@ -1033,8 +1033,8 @@ void main(void)
 	int err;
 
 	LOG_INF("START BMK DEVICE\n");
-	LOG_INF("%s\n",string_version);
-	LOG_INF("%s\n",string_date);
+	LOG_INF("%s\n",STR_VER);
+	LOG_INF("%s\n",STR_DATE);
 
 //-------------------------------------------------------------------------- GPIO
 	err = gpio_init();

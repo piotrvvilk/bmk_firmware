@@ -10,8 +10,8 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
-#include "common.h"
-#include "config_app.h"
+#include "../common.h"
+#include "../config_app.h"
 #include "lis2dh.h"
 
 //---------------------------------------------------------------------------

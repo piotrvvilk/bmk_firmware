@@ -116,7 +116,7 @@ static const uint8_t blue_pattern[40] 	  ={0x00, 0x00, 0x00, 0x20,
 int led_strip_init(void);
 int set_button_color(uint8_t position, uint8_t color);
 int set_button_pattern(const uint8_t *pattern);
-int turn_off_all_buttons(void);
+//int turn_off_all_buttons(void);
 int set_pattern_without_one_button(uint32_t position);
 
 void thread_led(void);

@@ -8,15 +8,15 @@ FILE(GLOB app_sources src/*.c)
 target_sources(app PRIVATE
   src/main.c
   src/board.c
-  src/version.c
   src/matrix_keyboard.c
   src/led.c
   src/display.c
-  src/lis2dh.c
-  src/max17048.c
   src/i2c_devices.c
+  src/lis2dh/lis2dh.c
+  src/max17048/max17048.c
   src/pictures/gta_picture.c
   src/pictures/vsc_picture.c
   src/pictures/altium_picture.c
   src/pictures/logo_picture.c
+  src/pictures/ble_picture.c
 )

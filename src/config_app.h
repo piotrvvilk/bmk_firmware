@@ -8,6 +8,7 @@
     #define	    USE_ALTIUM_PICTURE              1
     #define	    USE_VSC_PICTURE                 1
     #define	    USE_LOGO_PICTURE                1
+    #define	    USE_BLE_PICTURE                 1
 #endif
 
 //#define         USE_BLE                     1 
