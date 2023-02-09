@@ -19,4 +19,5 @@ target_sources(app PRIVATE
   src/pictures/altium_picture.c
   src/pictures/logo_picture.c
   src/pictures/ble_picture.c
+  src/pictures/battery_picture.c
 )
