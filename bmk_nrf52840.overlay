@@ -1,5 +1,5 @@
 /*
-* BMK Board			ST7789V (320x240)
+* BMK Board			ST7789V (320x240 color)
 * 
 * P0.24 			RST
 * P0.15 			DC (DATA/CMD)

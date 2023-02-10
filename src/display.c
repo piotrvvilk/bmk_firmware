@@ -40,12 +40,11 @@ int rc;
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
 //==================================================================================================================================================
-void display_battery(uint8_t battery_val)
+static void display_battery(uint8_t battery_val)
 {
     uint16_t x, y;
     uint32_t color;
     uint8_t bat;
-    
     unsigned char cyfry[3],znak,i;
 
     bat=battery_val;
@@ -95,14 +94,21 @@ void display_battery(uint8_t battery_val)
 	LV_IMG_DECLARE(battery);
 	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 	lv_img_set_src(img1, &battery);
-	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -50);
-	lv_obj_set_size(img1, 80, 24);
+	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -44);
+	lv_obj_set_size(img1, 80, 32);
 
+	//lv/_style_init(&style_label);
+	//lv_style_set_text_font(&style_label, &lv_font_montserrat_28);
 	lv_obj_t * label3 = lv_label_create(lv_scr_act());
+	
+	//lv_obj_add_style(label3, &style_label, LV_STATE_DEFAULT);
+	
 	lv_label_set_recolor(label3, true);
+	
 	lv_label_set_text(label3, cyfry);
+	//lv_obj_set_style_text_align(label3, LV_TEXT_ALIGN_CENTER, 0);
 	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(color), LV_PART_MAIN);
-	lv_obj_align(label3, LV_ALIGN_CENTER, 0, -50);
+	lv_obj_align(label3, LV_ALIGN_CENTER, 0, -44);
 
 }
 
