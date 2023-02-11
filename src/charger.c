@@ -46,14 +46,15 @@ void thread_charger(void)
 				#endif
 			
 			charger_data.usb_status = USB_DISCONNECTED;
+			charger_data.charger_status = CHARGER_DISABLE;
+			charger_off();
 
-
-			// 	if(my_led_status.led_battery_state!=LED_STANDBY)
-			// 	{
-			// 		my_led_status.led_battery_state=LED_BATTERY_NONE;                       //turn off led and LED_STANDBY state          
-			// 		display_data.display_on_flag=true;                                      //refresh lcd                    
-			// 		display_data.display_on_counter=1;                                      //clear lcd timeout
-			// 	}
+				// 	if(my_led_status.led_battery_state!=LED_STANDBY)
+				// 	{
+				// 		my_led_status.led_battery_state=LED_BATTERY_NONE;                       //turn off led and LED_STANDBY state          
+				// 		display_data.display_on_flag=true;                                      //refresh lcd                    
+				// 		display_data.display_on_counter=1;                                      //clear lcd timeout
+				// 	}
 			}
 
 			// charger_data.charged_counter=0;
@@ -61,7 +62,7 @@ void thread_charger(void)
 			// my_led_status.led_charging_one_time_flag=false;
 			// my_led_status.led_charged_one_time_flag=false;
 			// beep_one_time_flag=false;
-			charger_off();
+			
 		}
 		else                                                                                //USB connected
 		{
