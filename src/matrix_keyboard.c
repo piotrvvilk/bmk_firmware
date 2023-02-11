@@ -18,10 +18,11 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "main.h"
 #include "matrix_keyboard.h"
 #include "config_app.h"
 #include "board.h"
-#include "main.h"
+#include "led.h"
 
 
 static uint32_t 	key_pressed;
@@ -95,6 +96,7 @@ void thread_keyboard(void)
 				if(key_pressed!=0)
 				{
 					device_active_time_reset();													//reset standby counter	
+					device_state=BMK_ACTIVE;
 					led_key_pressed=key_pressed;												//led blink 
 					keyboard_blocked=1;															//keyboard locked
 					if(key_pressed==1)															//next theme											

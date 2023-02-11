@@ -12,6 +12,7 @@ target_sources(app PRIVATE
   src/led.c
   src/display.c
   src/i2c_devices.c
+  src/charger.c
   src/lis2dh/lis2dh.c
   src/max17048/max17048.c
   src/pictures/gta_picture.c

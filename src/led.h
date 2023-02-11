@@ -1,6 +1,22 @@
 #ifndef LED_H__
 #define LED_H__
 
+//------------------------------------------------------- thread
+#define 	THREAD_LED_PRIORITY 			7
+#define 	THREAD_LED_STACKSIZE  			512
+
+//------------------------------------------------------- themes
+#define		THEME_FIRST						1
+#define		THEME_LAST						4
+
+#define		THEME_INFO						1
+#define		THEME_GTA						2
+#define		THEME_ALTIUM					3
+#define		THEME_VSC						4
+
+#define		NO_THEME						0
+
+//------------------------------------------------------- led color
 #define		COLOR_WHITE		    			1
 #define		COLOR_RED		    			2
 #define		COLOR_GREEN		    			3
@@ -10,9 +26,6 @@
 #define		COLOR_VIOLET	    			6
 #define		COLOR_TURQUOISE	    			7
 #define		COLOR_ORANGE	    			8
-
-#define 	THREAD_LED_PRIORITY 			7
-#define 	THREAD_LED_STACKSIZE  			512
 
 #define     LED_RED_PWM                     0
 #define     LED_GREEN_PWM                   1
@@ -111,16 +124,47 @@ static const uint8_t blue_pattern[40] 	  ={0x00, 0x00, 0x00, 0x20,
 											0x00, 0x00, 0x00, 0x20, 
 											0x00, 0x00, 0x00, 0x20};
 
+static const uint8_t charging_s1[40] 	  ={0x00, 0x00, 0x00, 0x00, 
+							   				0x00, 0x00, 0x20, 0x00, 
+							   				0x00, 0x00, 0x00, 0x00,
+		         			   				0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00,
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00};
+
+static const uint8_t charging_s2[40] 	  ={0x00, 0x00, 0x00, 0x00, 
+							   				0x00, 0x00, 0x2A, 0x00, 
+							   				0x00, 0x00, 0x00, 0x00,
+		         			   				0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x2A, 0x00, 
+											0x00, 0x00, 0x2A, 0x00, 
+											0x00, 0x00, 0x00, 0x00,
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x00, 0x00};
+
+static const uint8_t charging_s3[40] 	  ={0x00, 0x00, 0x00, 0x00, 
+							   				0x00, 0x00, 0x34, 0x00, 
+							   				0x00, 0x00, 0x00, 0x00,
+		         			   				0x00, 0x00, 0x00, 0x00, 
+											0x00, 0x00, 0x34, 0x00, 
+											0x00, 0x00, 0x34, 0x00, 
+											0x00, 0x00, 0x00, 0x00,
+											0x00, 0x00, 0x34, 0x00, 
+											0x00, 0x00, 0x34, 0x00, 
+											0x00, 0x00, 0x34, 0x00};
 
 
+
+//------------------------------------------------------- public functions
 int led_strip_init(void);
 int set_button_color(uint8_t position, uint8_t color);
 int set_button_pattern(const uint8_t *pattern);
-//int turn_off_all_buttons(void);
 int set_pattern_without_one_button(uint32_t position);
-
 void thread_led(void);
-
 
 #endif
 

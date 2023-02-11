@@ -79,14 +79,14 @@ extern const struct gpio_dt_spec dispdc;
 // #define     led_blue_on()           gpio_pin_set_dt(&led_blue,1);
 // #define     led_blue_off()          gpio_pin_set_dt(&led_blue,0);
 
-#define     usb_detection_on()      gpio_pin_set_dt(&usbdet,1);
-#define     usb_detection_off()     gpio_pin_set_dt(&usbdet,0);
+#define     usb_detection_on()      gpio_pin_set_dt(&enusbdet,1);
+#define     usb_detection_off()     gpio_pin_set_dt(&enusbdet,0);
 
 #define     vled_on()               gpio_pin_set_dt(&vleden,1);
 #define     vled_off()              gpio_pin_set_dt(&vleden,0);
 
-#define     charger_on()            gpio_pin_set_dt(&chrgen,1);
-#define     charger_off()           gpio_pin_set_dt(&chrgen,0);
+#define     charger_on()            gpio_pin_set_dt(&chrgen,0);
+#define     charger_off()           gpio_pin_set_dt(&chrgen,1);
 
 #define     lcd_backlight_on()      gpio_pin_set_dt(&dispbk,1);
 #define     lcd_backlight_off()     gpio_pin_set_dt(&dispbk,0);

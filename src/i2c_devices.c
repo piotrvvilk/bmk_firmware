@@ -18,12 +18,12 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "main.h"
+#include "board.h"
+#include "config_app.h"
 #include "i2c_devices.h"
 #include "lis2dh/lis2dh.h"
 #include "max17048/max17048.h"
-#include "board.h"
-#include "main.h"
-#include "config_app.h"
 
 #ifdef DEBUG_LOG_I2C_DEVICES
 	LOG_MODULE_REGISTER(bmk_i2c_devices,LOG_LEVEL_DBG);
@@ -44,7 +44,9 @@ void thread_i2c_devices(void)
 	#ifdef USE_LIS2DH
 		accel_movement_detect(150);
 	#endif
-
+	
+	MAX17048GetCharge(&max17048_charge);
+	
 	while(1)
 	{
 		#ifdef USE_MAX17048

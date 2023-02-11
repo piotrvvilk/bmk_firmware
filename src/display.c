@@ -21,10 +21,11 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "main.h"
 #include "version.h"
 #include "board.h"
 #include "display.h"
-#include "main.h"
+#include "led.h"
 #include "matrix_keyboard.h"
 #include "config_app.h"
 #include "i2c_devices.h"
@@ -42,17 +43,17 @@ LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 //==================================================================================================================================================
 static void display_battery(uint8_t battery_val)
 {
-    uint16_t x, y;
+    //uint16_t x, y;
     uint32_t color;
     uint8_t bat;
-    unsigned char cyfry[3],znak,i;
+    unsigned char digits[3], tmp, i;
 
     bat=battery_val;
     for(i=0;i<3;i++)
     {
-        znak=bat%10;
+        tmp=bat%10;
         bat/=10;
-        cyfry[2-i]=znak+0x30;
+        digits[2-i]=tmp+0x30;
     }
     
     if(battery_val>15)
@@ -68,26 +69,27 @@ static void display_battery(uint8_t battery_val)
         color=0xFF0000;
     }
     
-    if(battery_val==100)
-    {
-        x = 80; 
-    }
-    if((battery_val>9)&&(battery_val<100))
-    {
-        x = 96;
-    }
-    else
-    {
-        x = 94;
-    }
+    // if(battery_val==100)
+    // {
+    //     x = 80; 
+    // }
+
+    // if((battery_val>95)&&(battery_val<100))
+    // {
+    //     x = 96;
+    // }
+    // else
+    // {
+    //     x = 94;
+    // }
     
-    y=198;
-    if(cyfry[0]=='0')
+    // y=198;
+    if(digits[0]=='0')
     {
-        cyfry[0]=' ';
-        if(cyfry[1]=='0') 
+        digits[0]=' ';
+        if(digits[1]=='0') 
         {
-            cyfry[1]=' ';        
+            digits[1]=' ';        
         }
     }
 
@@ -97,16 +99,9 @@ static void display_battery(uint8_t battery_val)
 	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -44);
 	lv_obj_set_size(img1, 80, 32);
 
-	//lv/_style_init(&style_label);
-	//lv_style_set_text_font(&style_label, &lv_font_montserrat_28);
 	lv_obj_t * label3 = lv_label_create(lv_scr_act());
-	
-	//lv_obj_add_style(label3, &style_label, LV_STATE_DEFAULT);
-	
 	lv_label_set_recolor(label3, true);
-	
-	lv_label_set_text(label3, cyfry);
-	//lv_obj_set_style_text_align(label3, LV_TEXT_ALIGN_CENTER, 0);
+	lv_label_set_text(label3, digits);
 	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(color), LV_PART_MAIN);
 	lv_obj_align(label3, LV_ALIGN_CENTER, 0, -44);
 

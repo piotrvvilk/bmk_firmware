@@ -22,6 +22,7 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "main.h"
 #include "board.h"
 
 //#define USER_BUTTON             DK_BTN1_MSK

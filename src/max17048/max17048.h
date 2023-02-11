@@ -29,11 +29,6 @@ int MAX17048GetVoltage(uint32_t *data);
 int MAX17048GetCharge(uint8_t *data);
 int MAX17048GetVersion(uint32_t *data); 
 
-//uint8_t MAX17048GetCompensateValue(void);         
-//uint8_t MAX17048GetAlertThreshold(void);
-//void MAX17048SetAlertThreshold(uint8_t threshold);
-//bool MAX17048ReadAlert(void); 
-//void MAX17048ClearAlert(void); 
 //====================================================================================
 
 #endif

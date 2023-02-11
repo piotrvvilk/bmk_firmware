@@ -21,12 +21,12 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
-#include "board.h"
 #include "main.h"
+#include "board.h"
 #include "led.h"
 #include "matrix_keyboard.h"
 #include "config_app.h"
-#include "common.h"
+#include "charger.h"
 
 LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 
@@ -73,6 +73,8 @@ uint8_t led_theme;
 
 int err;
 const struct device *led_pwm;
+
+uint32_t led_demo_counter;
 
 //=================================================================================================================
 int led_pwm_init(void)
@@ -297,6 +299,42 @@ void thread_led(void)
 			k_msleep(250);
 			set_button_pattern(current_pattern);										//turn on 
 			led_key_pressed=0;															//reset flag
+		}
+
+//-------------------------------------------------------------------------------------- demo ladowania aku na ledach
+		if((device_state==BMK_STANDBY)&&(charger_data.charger_status==CHARGER_CHARGING))
+		{
+			led_demo_counter++;
+			vled_on()
+			if(led_demo_counter==20)
+			{
+				current_pattern = charging_s1;	
+				set_button_pattern(current_pattern);				
+			}		
+			else if(led_demo_counter==40)
+			{
+				current_pattern = charging_s2;	
+				set_button_pattern(current_pattern);				
+			}
+			else if(led_demo_counter==60)
+			{
+				current_pattern = charging_s3;	
+				set_button_pattern(current_pattern);				
+			}
+			else if(led_demo_counter==80)
+			{
+				current_pattern = turn_off_pattern;
+				set_button_pattern(current_pattern);
+			}
+			else if(led_demo_counter==120)
+			{
+				led_demo_counter=0;
+			}
+		}
+		
+		if(device_state==BMK_ACTIVE)
+		{
+			led_demo_counter=0;
 		}
 
 		k_msleep(50);

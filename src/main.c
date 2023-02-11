@@ -32,13 +32,13 @@
 #include "config_app.h"
 #include "main.h"
 #include "board.h"
-#include "common.h"
 #include "version.h"
 #include "led.h"
 #include "matrix_keyboard.h"
 #include "display.h"
 #include "i2c_devices.h"
 #include "lis2dh/lis2dh.h"
+#include "charger.h"
 
 #define WORQ_THREAD_STACK_SIZE  			512
 
@@ -172,6 +172,7 @@ K_MSGQ_DEFINE(mitm_queue,
 	      4);
 
 uint32_t     device_active_counter;		  
+uint32_t     device_state;
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -1025,13 +1026,18 @@ void device_active_time_stop(void)								//stop counting
 	K_THREAD_DEFINE(thread_i2c_devices_id, THREAD_I2C_DEVICES_STACKSIZE, thread_i2c_devices, NULL, NULL, NULL, THREAD_I2C_DEVICES_PRIORITY, 0, 0);
 #endif
 
+#ifdef USE_CHARGER
+	K_THREAD_DEFINE(thread_charger_id, THREAD_CHARGER_STACKSIZE, thread_charger, NULL, NULL, NULL, THREAD_CHARGER_PRIORITY, 0, 0);
+#endif
+
+
 //==================================================================================================================================================
 //===========================================================   MAIN LOOP   ========================================================================
 //==================================================================================================================================================
 void main(void)
 {
 	int err;
-
+	
 	LOG_INF("START BMK DEVICE\n");
 	LOG_INF("%s\n",STR_VER);
 	LOG_INF("%s\n",STR_DATE);
@@ -1090,23 +1096,27 @@ void main(void)
 			lis_int1_flag=false;
 			release_interrupt();		
 			device_active_time_reset();							//start counting
+			device_state=BMK_ACTIVE;
 			
 			if(device_theme==NO_THEME)							//restore last theme
 			{
 				device_theme = last_theme;
 			}
+			
 		}	
 
 		if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
 
 		if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
 		{
-			device_active_time_stop();
-			last_theme=device_theme;							//remember last theme 
-			device_theme=NO_THEME;								//turn off display, led strip and led pwm
 			#ifdef DEBUG_LOG_DEVICE
 				LOG_INF("Timeout\n");		
 			#endif
+			
+			device_active_time_stop();
+			last_theme=device_theme;							//remember last theme 
+			device_theme=NO_THEME;								//turn off display, led strip and led pwm
+			device_state=BMK_STANDBY; 
 		}
 
 		k_sleep(K_MSEC(100));
