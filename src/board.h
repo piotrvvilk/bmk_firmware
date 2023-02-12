@@ -10,6 +10,12 @@
 //SPI3, LCD
 //MISO: P0.14 (SIO14)
 
+
+//nrf_gpio_cfg_input(CHRG_MON, NRF_GPIO_PIN_PULLUP);
+//nrf_gpio_cfg_input(USB_DETECT, NRF_GPIO_PIN_NOPULL);
+//nrf_gpio_cfg_input(ACCEL_INT_1, NRF_GPIO_PIN_PULLDOWN);
+//nrf_gpio_cfg_input(CHRG_PRG,NRF_GPIO_PIN_NOPULL);
+
 //----------------------------------------------------------------- 
 #define	LEDR_NODE		DT_ALIAS(ledr)
 #define	LEDG_NODE		DT_ALIAS(ledg)

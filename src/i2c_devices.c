@@ -24,6 +24,7 @@
 #include "i2c_devices.h"
 #include "lis2dh/lis2dh.h"
 #include "max17048/max17048.h"
+#include "charger.h"
 
 #ifdef DEBUG_LOG_I2C_DEVICES
 	LOG_MODULE_REGISTER(bmk_i2c_devices,LOG_LEVEL_DBG);
@@ -56,6 +57,17 @@ void thread_i2c_devices(void)
 				max17048_read_counter=0;
 				MAX17048GetVoltage(&max17048_voltage);
 				MAX17048GetCharge(&max17048_charge);
+
+				if((max17048_charge>90)&&(charger_data.charger_status = CHARGER_DONE))			//correction
+				{
+					max17048_charge=100;
+				}
+
+				if((max17048_charge>95)&&(charger_data.charger_status = CHARGER_DISABLE))		//correction
+				{
+					max17048_charge=100;
+				}
+
 				#ifdef DEBUG_LOG_MAX17048
 					LOG_INF("VOLTAGE: %dmV \n", max17048_voltage);
 					LOG_INF("CHARGE: %d%% \n", max17048_charge);

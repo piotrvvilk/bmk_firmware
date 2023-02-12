@@ -80,18 +80,18 @@ static void display_battery(uint8_t battery_val)
         }
     }
 //-------------------------------------------------------------- battery icon
-	LV_IMG_DECLARE(battery_hot);
+	//LV_IMG_DECLARE(battery_hot);
 	LV_IMG_DECLARE(battery_cold);
 	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 	
-	if(charger_data.charger_status==CHARGER_CHARGING)
-	{
-		lv_img_set_src(img1, &battery_hot);	
-	}
-	else
-	{
+	// if(charger_data.charger_status==CHARGER_CHARGING)
+	// {
+	// 	lv_img_set_src(img1, &battery_hot);	
+	// }
+	// else
+	// {
 		lv_img_set_src(img1, &battery_cold);
-	}	
+//	}	
 
 	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -44);
 	lv_obj_set_size(img1, 80, 32);
@@ -116,13 +116,20 @@ static void display_battery(uint8_t battery_val)
 		lv_obj_set_size(img2, 88, 36);
 	}
 
-//-------------------------------------------------------------- charging value
+//-------------------------------------------------------------- charging value label
 	lv_obj_t * label3 = lv_label_create(lv_scr_act());
 	lv_label_set_recolor(label3, true);
 	lv_label_set_text(label3, digits);
 	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(color), LV_PART_MAIN);
-	lv_obj_align(label3, LV_ALIGN_CENTER, 0, -44);
-
+	
+	if(digits[0]='1')
+	{
+		lv_obj_align(label3, LV_ALIGN_CENTER, 5, -44);	
+	}
+	else
+	{
+		lv_obj_align(label3, LV_ALIGN_CENTER, 0, -44);
+	}
 }
 
 //==================================================================================================================================================

@@ -40,7 +40,7 @@
 #include "lis2dh/lis2dh.h"
 #include "charger.h"
 
-#define WORQ_THREAD_STACK_SIZE  			512
+//#define WORQ_THREAD_STACK_SIZE  			512
 
 #define DEVICE_NAME     					CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN 					(sizeof(DEVICE_NAME) - 1)
