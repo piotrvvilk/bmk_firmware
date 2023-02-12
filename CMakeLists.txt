@@ -21,4 +21,5 @@ target_sources(app PRIVATE
   src/pictures/logo_picture.c
   src/pictures/ble_picture.c
   src/pictures/battery_picture.c
+  src/pictures/plug_picture.c
 )

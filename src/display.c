@@ -29,6 +29,7 @@
 #include "matrix_keyboard.h"
 #include "config_app.h"
 #include "i2c_devices.h"
+#include "charger.h"
 
 const struct device *display_dev;
 
@@ -43,11 +44,11 @@ LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 //==================================================================================================================================================
 static void display_battery(uint8_t battery_val)
 {
-    //uint16_t x, y;
     uint32_t color;
     uint8_t bat;
     unsigned char digits[3], tmp, i;
 
+//-------------------------------------------------------------- charging value to string
     bat=battery_val;
     for(i=0;i<3;i++)
     {
@@ -55,7 +56,8 @@ static void display_battery(uint8_t battery_val)
         bat/=10;
         digits[2-i]=tmp+0x30;
     }
-    
+
+//-------------------------------------------------------------- charging value font color    
     if(battery_val>15)
     {
         color=0x00FF00;
@@ -69,21 +71,6 @@ static void display_battery(uint8_t battery_val)
         color=0xFF0000;
     }
     
-    // if(battery_val==100)
-    // {
-    //     x = 80; 
-    // }
-
-    // if((battery_val>95)&&(battery_val<100))
-    // {
-    //     x = 96;
-    // }
-    // else
-    // {
-    //     x = 94;
-    // }
-    
-    // y=198;
     if(digits[0]=='0')
     {
         digits[0]=' ';
@@ -92,13 +79,44 @@ static void display_battery(uint8_t battery_val)
             digits[1]=' ';        
         }
     }
-
-	LV_IMG_DECLARE(battery);
+//-------------------------------------------------------------- battery icon
+	LV_IMG_DECLARE(battery_hot);
+	LV_IMG_DECLARE(battery_cold);
 	lv_obj_t * img1 = lv_img_create(lv_scr_act());
-	lv_img_set_src(img1, &battery);
+	
+	if(charger_data.charger_status==CHARGER_CHARGING)
+	{
+		lv_img_set_src(img1, &battery_hot);	
+	}
+	else
+	{
+		lv_img_set_src(img1, &battery_cold);
+	}	
+
 	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -44);
 	lv_obj_set_size(img1, 80, 32);
 
+//-------------------------------------------------------------- usb plug icon
+	LV_IMG_DECLARE(plug_hot);
+	LV_IMG_DECLARE(plug_cold);
+	lv_obj_t * img2 = lv_img_create(lv_scr_act());
+	
+	if(charger_data.usb_status==USB_CONNECTED)
+	{
+		if(charger_data.charger_status==CHARGER_CHARGING)
+		{
+			lv_img_set_src(img2, &plug_hot);	
+		}
+		else
+		{
+			lv_img_set_src(img2, &plug_cold);
+		}	
+		
+	    lv_obj_align(img2, LV_ALIGN_CENTER, 100, -44);
+		lv_obj_set_size(img2, 88, 36);
+	}
+
+//-------------------------------------------------------------- charging value
 	lv_obj_t * label3 = lv_label_create(lv_scr_act());
 	lv_label_set_recolor(label3, true);
 	lv_label_set_text(label3, digits);

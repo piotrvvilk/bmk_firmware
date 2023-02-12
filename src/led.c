@@ -326,7 +326,7 @@ void thread_led(void)
 				current_pattern = turn_off_pattern;
 				set_button_pattern(current_pattern);
 			}
-			else if(led_demo_counter==120)
+			else if(led_demo_counter==100)
 			{
 				led_demo_counter=0;
 			}
