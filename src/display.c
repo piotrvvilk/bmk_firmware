@@ -41,6 +41,12 @@ int rc;
 
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
+static uint32_t get_color_value(uint8_t battery_val){
+	if (battery_val < 6) return 0xFF0000;
+	if (battery_val < 16) return 0x0000FF;
+	return 0x00FF00;
+}
+
 //==================================================================================================================================================
 static void display_battery(uint8_t battery_val)
 {
@@ -58,27 +64,15 @@ static void display_battery(uint8_t battery_val)
     }
 
 //-------------------------------------------------------------- charging value font color    
-    if(battery_val>15)
-    {
-        color=0x00FF00;
-    }
-    else if((battery_val>5)&&(battery_val<16))
-    {
-        color=0x0000FF;
-    }
-    else if(battery_val<6)
-    {
-        color=0xFF0000;
-    }
-    
-    if(digits[0]=='0')
-    {
-        digits[0]=' ';
-        if(digits[1]=='0') 
-        {
-            digits[1]=' ';        
-        }
-    }
+    color = get_color_value(battery_val);
+	if(digits[0]=='0')
+	{
+		digits[0]=' ';
+		if(digits[1]=='0') 
+		{
+			digits[1]=' ';        
+		}
+	}
 //-------------------------------------------------------------- battery icon
 	//LV_IMG_DECLARE(battery_hot);
 	LV_IMG_DECLARE(battery_cold);
