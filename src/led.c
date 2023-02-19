@@ -74,8 +74,13 @@ uint8_t led_theme;
 int err;
 const struct device *led_pwm;
 
-uint32_t led_demo_counter;													//charging counter - led on keypad
+uint32_t led_demo_counter;													//charging counter - led on keypad (time between following sequences )
 uint32_t led_pwm_counter;													//charging counter - led on bottom side 
+
+uint32_t led_strip_charged_counter;											//time between next strip driving when batt is charged (prevent led driving all the time) 
+uint32_t led_pwm_charged_counter;											//time between next led pwm driving when batt is charged (--||--)
+
+uint32_t refresh_led_flag;														//refresh led after usb cable or chargin state is changed	
 
 //=================================================================================================================
 int led_pwm_init(void)
@@ -201,8 +206,13 @@ void thread_led(void)
 
  	while(1)
  	{
-		if(device_theme!=led_theme)
+		if((device_theme!=led_theme)||(refresh_led_flag==1))
 		{
+			refresh_led_flag=0;
+			#ifdef DEBUG_LOG_LED
+				LOG_ERR("REFRESH LED STATE\n");
+			#endif
+			
 			if(device_theme==THEME_GTA)
 			{
 				vled_on()																//led power on
@@ -302,7 +312,11 @@ void thread_led(void)
 				
 				err = led_off(led_pwm, LED_BLUE_PWM); 
 				if (err < 0) { LOG_ERR("err=%d", err); }
-				vled_off()
+				
+				if(charger_data.usb_status==USB_DISCONNECTED)							//turn off boost only when usb is unpluged
+				{
+					vled_off()
+				}
 			}
 
 		}
@@ -364,21 +378,45 @@ void thread_led(void)
 
 			if((led_pwm_counter>1)&&(led_pwm_counter<100))
 			{	
-				led_set_brightness(led_pwm, LED_GREEN_PWM, led_pwm_counter);				//up
+				led_set_brightness(led_pwm, LED_GREEN_PWM, led_pwm_counter);			//up
 			}
 			else if((led_pwm_counter>99)&&(led_pwm_counter<202))
 			{
-				led_set_brightness(led_pwm, LED_GREEN_PWM, (200-led_pwm_counter));			//and down
+				led_set_brightness(led_pwm, LED_GREEN_PWM, (200-led_pwm_counter));		//and down
 			}
 
-			if(led_pwm_counter==200)														//turn off for a while		
+			if(led_pwm_counter==200)													//turn off for a while		
 			{
 				led_off(led_pwm, LED_GREEN_PWM); 
 			}
 
-			if(led_pwm_counter>240) led_pwm_counter=0;										//and from the beginning
+			if(led_pwm_counter>240) led_pwm_counter=0;									//and from the beginning
 		}
 
+//-------------------------------------------------------------------------------------- battery charged: demo on top led strip
+		if((device_state==BMK_STANDBY)&&(charger_data.charger_status==CHARGER_DONE))
+		{
+			led_pwm_charged_counter=0;
+			if(led_strip_charged_counter==0)											//prevent led driving all the time
+			{
+				current_pattern = led_strip_charged;
+				set_button_pattern(current_pattern);
+			}
+			led_strip_charged_counter++;
+			if(led_strip_charged_counter>100) led_strip_charged_counter=0;				//repeat every 10sec
+		}
+
+//-------------------------------------------------------------------------------------- battery charged: demo on bottom leds 
+		if((device_state==BMK_ACTIVE)&&(charger_data.charger_status==CHARGER_DONE))
+		{
+			led_strip_charged_counter=0;
+			if(led_pwm_charged_counter==0)												//prevent led driving all the time
+			{
+				led_set_brightness(led_pwm, LED_GREEN_PWM, 50);			
+			}
+			led_pwm_charged_counter++;
+			if(led_pwm_charged_counter>100) led_pwm_charged_counter=0;
+		}
 
 //-------------------------------------------------------------------------------------- 
 		k_msleep(50);

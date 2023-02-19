@@ -1091,7 +1091,9 @@ void main(void)
 //==================================================================================================================================================
 	while (1) 
 	{
-		if(lis_int1_flag)
+
+//-------------------------------------------------------------- lis2dh interrupt		
+		if(lis_int1_flag)										
 		{
 			lis_int1_flag=false;
 			release_interrupt();		
@@ -1104,7 +1106,7 @@ void main(void)
 			}
 			
 		}	
-
+//--------------------------------------------------------------- timeout
 		if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
 
 		if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
@@ -1117,6 +1119,8 @@ void main(void)
 			last_theme=device_theme;							//remember last theme 
 			device_theme=NO_THEME;								//turn off display, led strip and led pwm
 			device_state=BMK_STANDBY; 
+			led_pwm_charged_counter=0;
+			led_strip_charged_counter=0;
 		}
 
 		k_sleep(K_MSEC(100));

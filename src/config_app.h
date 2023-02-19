@@ -34,7 +34,7 @@
 #ifdef          DEBUG_LOG_APP                     
     #define     DEBUG_LOG_DEVICE                1
     //#define     DEBUG_LOG_MATRIX_KEYBOARD       1
-    //#define     DEBUG_LOG_LED                   1
+    #define     DEBUG_LOG_LED                   1
     #define     DEBUG_LOG_LIS2DH                1
     #define     DEBUG_LOG_MAX17048              1
     #define     DEBUG_LOG_I2C_DEVICES           1

@@ -22,13 +22,20 @@
 #include "max17048/max17048.h"
 #include "board.h"
 #include "main.h"
+#include "display.h"
+#include "led.h"
 #include "config_app.h"
 
 #ifdef DEBUG_LOG_I2C_DEVICES
 	LOG_MODULE_REGISTER(bmk_charger_devices,LOG_LEVEL_DBG);
 #endif	
 
-charger_data_t     charger_data;
+charger_data_t      charger_data;
+uint32_t 			usb_pin_state;
+uint32_t 			usb_pin_old_state;
+uint32_t 			charging_pin_state;
+uint32_t 			charging_pin_old_state;
+
 
 //==================================================================================================================================================
 void thread_charger(void)
@@ -39,36 +46,37 @@ void thread_charger(void)
 
 		if(gpio_pin_get_dt(&usbdet)==0)                                                		//USB disconnected
 		{
-			if(charger_data.usb_status != USB_DISCONNECTED)                         		//only once after disconnected usb cable
-			{
-				#ifdef DEBUG_LOG_CHARGER
-					LOG_INF("USB DISCONNECTED\n");
-				#endif
+			#ifdef DEBUG_LOG_CHARGER
+				LOG_INF("USB DISCONNECTED\n");
+			#endif
 			
 			charger_data.usb_status = USB_DISCONNECTED;
 			charger_data.charger_status = CHARGER_DISABLE;
 			charger_off();
 
-				// 	if(my_led_status.led_battery_state!=LED_STANDBY)
-				// 	{
-				// 		my_led_status.led_battery_state=LED_BATTERY_NONE;                       //turn off led and LED_STANDBY state          
-				// 		display_data.display_on_flag=true;                                      //refresh lcd                    
-				// 		display_data.display_on_counter=1;                                      //clear lcd timeout
-				// 	}
+			usb_pin_state=0;
+			if(usb_pin_old_state!=usb_pin_state)											//detect when pin state is change
+			{
+				usb_pin_old_state=usb_pin_state;
+				refresh_screen_flag=1;														//only once after connected usb cable
+				refresh_led_flag=1;											
 			}
 
-			// charger_data.charged_counter=0;
-			
-			// my_led_status.led_charging_one_time_flag=false;
-			// my_led_status.led_charged_one_time_flag=false;
-			// beep_one_time_flag=false;
-			
 		}
 		else                                                                                //USB connected
 		{
 			#ifdef DEBUG_LOG_CHARGER
 				LOG_INF("USB CONNECTED\n");
 			#endif
+
+			usb_pin_state=1;
+			if(usb_pin_old_state!=usb_pin_state)											//detect when pin state is change
+			{
+				usb_pin_old_state=usb_pin_state;
+				refresh_screen_flag=1;														//only once after disconnected usb cable
+				refresh_led_flag=1;											
+			}
+
 
 			charger_data.usb_status = USB_CONNECTED;
 			charger_on();
@@ -79,24 +87,19 @@ void thread_charger(void)
 					LOG_INF("BATTERY IS FULL\n");
 				#endif
 
-				// if(beep_one_time_flag==false)
-				// {
-				// 	beep_one_time_flag=true;
-				// 	beep_charging();
-				// }
-
 				charger_data.charged_counter++;
 
-				if(charger_data.charged_counter>2)                                      //nie pokazuj od razu ze naladowane                
+				if(charger_data.charged_counter>2)                                      	//nie pokazuj od razu ze naladowane                
 				{
 				 	charger_data.charger_status = CHARGER_DONE;
-				// 	my_led_status.led_battery_state=LED_BATTERY_CHARGED;
-		
-				// 	if(my_led_status.led_charged_one_time_flag==false)                      //zasygnalizuj od razu ze naladowane
-				// 	{
-				// 		my_led_status.led_charged_one_time_flag=true;
-				// 		my_led_status.led_battery_counter=LED_CHARGED_PERIOD-5;
-				// 	}
+				}
+
+				charging_pin_state=0;
+				if(charging_pin_old_state!=charging_pin_state)								//detect when pin state is change
+				{
+					charging_pin_old_state=charging_pin_state;
+					refresh_screen_flag=1;													//only once after stop charging
+					refresh_led_flag=1;											
 				}
 			}
 			else                                                                            //still charging	
@@ -107,15 +110,15 @@ void thread_charger(void)
 
 				charger_data.charged_counter=0;
 				charger_data.charger_status = CHARGER_CHARGING;	
-				// my_led_status.led_battery_state=LED_BATTERY_CHARGING;
-		
-				// if(my_led_status.led_charging_one_time_flag==false)                         //zasygnalizuj od razu podlaczenie kabla USB przez dzwiek i ledy
-				// {
-				// 	my_led_status.led_charging_one_time_flag=true;
-				// 	my_led_status.led_battery_counter=LED_CHARGING_PERIOD-5;
-				// 	display_data.display_on_flag=true;                                      //refresh lcd                    
-				// 	display_data.display_on_counter=1;                                      //clear lcd timeou
-				// }
+
+				charging_pin_state=1;
+				if(charging_pin_old_state!=charging_pin_state)								//detect when pin state is change
+				{
+					charging_pin_old_state=charging_pin_state;
+					refresh_screen_flag=1;													//only once after start charging
+					refresh_led_flag=1;											
+				}
+
 			}
 		}
 		usb_detection_off();

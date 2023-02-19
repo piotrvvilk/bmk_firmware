@@ -39,6 +39,8 @@ uint8_t display_theme;
 size_t cursor = 0, color = 0;
 int rc;
 
+uint32_t refresh_screen_flag;
+
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
 static uint32_t get_color_value(uint8_t battery_val){
@@ -48,13 +50,13 @@ static uint32_t get_color_value(uint8_t battery_val){
 }
 
 //==================================================================================================================================================
-static void display_battery(uint8_t battery_val)
+static void display_battery(uint8_t battery_val)				//dispaly battery and usb plug icons
 {
     uint32_t color;
     uint8_t bat;
     unsigned char digits[3], tmp, i;
 
-//-------------------------------------------------------------- charging value to string
+//-------------------------------------------------------------- battery value to string
     bat=battery_val;
     for(i=0;i<3;i++)
     {
@@ -63,30 +65,33 @@ static void display_battery(uint8_t battery_val)
         digits[2-i]=tmp+0x30;
     }
 
-//-------------------------------------------------------------- charging value font color    
-    color = get_color_value(battery_val);
-	if(digits[0]=='0')
-	{
-		digits[0]=' ';
-		if(digits[1]=='0') 
-		{
-			digits[1]=' ';        
-		}
-	}
+//-------------------------------------------------------------- battery value font color    
+    if(battery_val>15)
+    {
+        color=0x00FF00;
+    }
+    else if((battery_val>5)&&(battery_val<16))
+    {
+        color=0x0000FF;
+    }
+    else if(battery_val<6)
+    {
+        color=0xFF0000;
+    }
+    
+    if(digits[0]=='0')
+    {
+        digits[0]=' ';
+        if(digits[1]=='0') 
+        {
+            digits[1]=' ';        
+        }
+    }
 //-------------------------------------------------------------- battery icon
-	//LV_IMG_DECLARE(battery_hot);
 	LV_IMG_DECLARE(battery_cold);
 	lv_obj_t * img1 = lv_img_create(lv_scr_act());
 	
-	// if(charger_data.charger_status==CHARGER_CHARGING)
-	// {
-	// 	lv_img_set_src(img1, &battery_hot);	
-	// }
-	// else
-	// {
-		lv_img_set_src(img1, &battery_cold);
-//	}	
-
+	lv_img_set_src(img1, &battery_cold);
 	lv_obj_align(img1, LV_ALIGN_CENTER, 0, -44);
 	lv_obj_set_size(img1, 80, 32);
 
@@ -110,13 +115,13 @@ static void display_battery(uint8_t battery_val)
 		lv_obj_set_size(img2, 88, 36);
 	}
 
-//-------------------------------------------------------------- charging value label
+//-------------------------------------------------------------- charging value text
 	lv_obj_t * label3 = lv_label_create(lv_scr_act());
 	lv_label_set_recolor(label3, true);
 	lv_label_set_text(label3, digits);
 	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(color), LV_PART_MAIN);
 	
-	if(digits[0]='1')
+	if(digits[0]='1')											//position correction
 	{
 		lv_obj_align(label3, LV_ALIGN_CENTER, 5, -44);	
 	}
@@ -127,10 +132,49 @@ static void display_battery(uint8_t battery_val)
 }
 
 //==================================================================================================================================================
+void display_info_screen(void)
+{
+	display_theme=device_theme;
+	lv_obj_clean(lv_scr_act());
+
+	LV_IMG_DECLARE(logo);										//logo icon
+	lv_obj_t * img1 = lv_img_create(lv_scr_act());
+	lv_img_set_src(img1, &logo);
+	lv_obj_align(img1, LV_ALIGN_CENTER, -120, 0);
+	lv_obj_set_size(img1, 80, 80);
+	
+	LV_IMG_DECLARE(ble);										//ble icon
+	img1 = lv_img_create(lv_scr_act());
+	lv_img_set_src(img1, &ble);
+	lv_obj_align(img1, LV_ALIGN_CENTER, 110, 40);
+	lv_obj_set_size(img1, 48, 64);
+
+	lv_obj_t * label1 = lv_label_create(lv_scr_act());			//version and date	
+	lv_obj_t * label2 = lv_label_create(lv_scr_act());
+	lv_label_set_recolor(label1, true);
+	lv_label_set_recolor(label2, true);
+	
+	lv_label_set_text(label1, STR_VER);
+	lv_obj_set_style_text_color(label1, lv_color_hex(0xffffff), LV_PART_MAIN);
+	lv_obj_align(label1, LV_ALIGN_CENTER, 0, 20);
+	
+	lv_label_set_text(label2, STR_DATE);
+	lv_obj_set_style_text_color(label2, lv_color_hex(0xffffff), LV_PART_MAIN);
+	lv_obj_align(label2, LV_ALIGN_CENTER, 0, 50);
+	
+	display_battery(max17048_charge);							//battery and usb cable
+
+	lv_task_handler();											//on screen
+	display_blanking_off(display_dev);
+	
+	lcd_backlight_on();		
+}
+
+//==================================================================================================================================================
 void thread_lcd(void)
 {
 	#ifdef USE_DISPLAY
-
+//----------------------------------------------------------------------------- display init
 		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
 		if (!device_is_ready(display_dev)) {
@@ -138,7 +182,8 @@ void thread_lcd(void)
 			return;
 		}
 		lcd_backlight_on();
-			
+
+//-------------------------------------------------------------- 			
 		lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
 		LV_IMG_DECLARE(logo);
@@ -151,11 +196,14 @@ void thread_lcd(void)
     
 		while(1)
 		{
-			if(device_theme!=display_theme)
+//----------------------------------------------------------------------------- gta theme			
+			if((device_theme!=display_theme)||(refresh_screen_flag==1))
 			{
+				refresh_screen_flag=0;
+
 				if(device_theme==THEME_GTA)
 				{
-					display_theme=device_theme;
+					display_theme=device_theme;									
 					LV_IMG_DECLARE(gta);
 					lv_obj_t * img1 = lv_img_create(lv_scr_act());
 					lv_img_set_src(img1, &gta);
@@ -166,6 +214,7 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
+//----------------------------------------------------------------------------- altium theme			
 				if(device_theme==THEME_ALTIUM)
 				{
 					display_theme=device_theme;
@@ -180,7 +229,7 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
-
+//----------------------------------------------------------------------------- vsc theme			
 				if(device_theme==THEME_VSC)
 				{
 					display_theme=device_theme;
@@ -195,44 +244,12 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
-
+//----------------------------------------------------------------------------- info theme			
 				if(device_theme==THEME_INFO)
 				{
-					display_theme=device_theme;
-					lv_obj_clean(lv_scr_act());
-
-					LV_IMG_DECLARE(logo);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-					lv_img_set_src(img1, &logo);
-					lv_obj_align(img1, LV_ALIGN_CENTER, -120, 0);
-					lv_obj_set_size(img1, 80, 80);
 					
-					LV_IMG_DECLARE(ble);
-					img1 = lv_img_create(lv_scr_act());
-					lv_img_set_src(img1, &ble);
-					lv_obj_align(img1, LV_ALIGN_CENTER, 110, 40);
-					lv_obj_set_size(img1, 48, 64);
-				
-					lv_obj_t * label1 = lv_label_create(lv_scr_act());
-					lv_obj_t * label2 = lv_label_create(lv_scr_act());
-					lv_label_set_recolor(label1, true);
-					lv_label_set_recolor(label2, true);
-					
-					lv_label_set_text(label1, STR_VER);
-					lv_obj_set_style_text_color(label1, lv_color_hex(0xffffff), LV_PART_MAIN);
-					lv_obj_align(label1, LV_ALIGN_CENTER, 0, 20);
-					
-					lv_label_set_text(label2, STR_DATE);
-					lv_obj_set_style_text_color(label2, lv_color_hex(0xffffff), LV_PART_MAIN);
-					lv_obj_align(label2, LV_ALIGN_CENTER, 0, 50);
-					
-					display_battery(max17048_charge);
-
-					lv_task_handler();
-					display_blanking_off(display_dev);
-					
-					lcd_backlight_on();
-				}
+					display_info_screen();									
+				}	
 
 				if(device_theme==NO_THEME)
 				{

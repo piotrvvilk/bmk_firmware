@@ -58,14 +58,22 @@ void thread_i2c_devices(void)
 				MAX17048GetVoltage(&max17048_voltage);
 				MAX17048GetCharge(&max17048_charge);
 
-				if((max17048_charge>90)&&(charger_data.charger_status = CHARGER_DONE))			//correction
+				if((max17048_charge>94)&&(charger_data.charger_status == CHARGER_DISABLE))		//correction
 				{
-					max17048_charge=100;
+					max17048_charge=98;
+					LOG_INF("98");
 				}
 
-				if((max17048_charge>95)&&(charger_data.charger_status = CHARGER_DISABLE))		//correction
+				if((max17048_charge>95)&&(charger_data.charger_status == CHARGER_CHARGING))		//correction
+				{
+					max17048_charge=99;
+					LOG_INF("99");
+				}
+
+				if((max17048_charge>90)&&(charger_data.charger_status == CHARGER_DONE))			//correction
 				{
 					max17048_charge=100;
+					LOG_INF("100");
 				}
 
 				#ifdef DEBUG_LOG_MAX17048

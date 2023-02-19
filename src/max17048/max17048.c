@@ -122,7 +122,6 @@ int MAX17048GetCharge(uint8_t *data)
 {
     int err;
     uint8_t dta[2];
-//	float fl;													//testowe
     
     err = i2c_read_data(SOC_REGISTER, dta, 2);
     
