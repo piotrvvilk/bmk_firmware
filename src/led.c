@@ -80,7 +80,7 @@ uint32_t led_pwm_counter;													//charging counter - led on bottom side
 uint32_t led_strip_charged_counter;											//time between next strip driving when batt is charged (prevent led driving all the time) 
 uint32_t led_pwm_charged_counter;											//time between next led pwm driving when batt is charged (--||--)
 
-uint32_t refresh_led_flag;														//refresh led after usb cable or chargin state is changed	
+bool refresh_led_flag;														//refresh led after usb cable or chargin state is changed	
 
 //=================================================================================================================
 int led_pwm_init(void)
@@ -206,9 +206,9 @@ void thread_led(void)
 
  	while(1)
  	{
-		if((device_theme!=led_theme)||(refresh_led_flag==1))
+		if((device_theme!=led_theme)||(refresh_led_flag==true))
 		{
-			refresh_led_flag=0;
+			refresh_led_flag=false;
 			#ifdef DEBUG_LOG_LED
 				LOG_ERR("REFRESH LED STATE\n");
 			#endif
@@ -318,7 +318,6 @@ void thread_led(void)
 					vled_off()
 				}
 			}
-
 		}
 
 		if(led_key_pressed!=0)															//if key pressed
@@ -329,44 +328,8 @@ void thread_led(void)
 			led_key_pressed=0;															//reset flag
 		}
 
-//-------------------------------------------------------------------------------------- charging bat: demo on top leds 
-		if((device_state==BMK_STANDBY)&&(charger_data.charger_status==CHARGER_CHARGING))
-		{
-			led_demo_counter++;
-			vled_on()
-			if(led_demo_counter==20)
-			{
-				current_pattern = charging_s1;	
-				set_button_pattern(current_pattern);				
-			}		
-			else if(led_demo_counter==40)
-			{
-				current_pattern = charging_s2;	
-				set_button_pattern(current_pattern);				
-			}
-			else if(led_demo_counter==60)
-			{
-				current_pattern = charging_s3;	
-				set_button_pattern(current_pattern);				
-			}
-			else if(led_demo_counter==80)
-			{
-				current_pattern = turn_off_pattern;
-				set_button_pattern(current_pattern);
-			}
-			else if(led_demo_counter==100)
-			{
-				led_demo_counter=0;
-			}
-		}
-		
-		if(device_state==BMK_ACTIVE)
-		{
-			led_demo_counter=0;
-		}
-
 //-------------------------------------------------------------------------------------- charging bat: demo on bottom leds 
-		if((device_state==BMK_ACTIVE)&&charger_data.charger_status==CHARGER_CHARGING)
+		if(charger_data.charger_status==CHARGER_CHARGING)
 		{
 			if(led_pwm_counter==2)
 			{
@@ -393,21 +356,8 @@ void thread_led(void)
 			if(led_pwm_counter>240) led_pwm_counter=0;									//and from the beginning
 		}
 
-//-------------------------------------------------------------------------------------- battery charged: demo on top led strip
-		if((device_state==BMK_STANDBY)&&(charger_data.charger_status==CHARGER_DONE))
-		{
-			led_pwm_charged_counter=0;
-			if(led_strip_charged_counter==0)											//prevent led driving all the time
-			{
-				current_pattern = led_strip_charged;
-				set_button_pattern(current_pattern);
-			}
-			led_strip_charged_counter++;
-			if(led_strip_charged_counter>100) led_strip_charged_counter=0;				//repeat every 10sec
-		}
-
 //-------------------------------------------------------------------------------------- battery charged: demo on bottom leds 
-		if((device_state==BMK_ACTIVE)&&(charger_data.charger_status==CHARGER_DONE))
+		if(charger_data.charger_status==CHARGER_DONE)
 		{
 			led_strip_charged_counter=0;
 			if(led_pwm_charged_counter==0)												//prevent led driving all the time

@@ -38,7 +38,7 @@
 extern uint32_t led_strip_charged_counter;	
 extern uint32_t led_pwm_charged_counter;
 
-extern uint32_t refresh_led_flag;
+extern bool refresh_led_flag;
 
 static const uint8_t info_pattern[40] =    {0x00, 0x20, 0x2F, 0x2F, 
 											0x00, 0x00, 0x00, 0x00, 

@@ -39,7 +39,7 @@ uint8_t display_theme;
 size_t cursor = 0, color = 0;
 int rc;
 
-uint32_t refresh_screen_flag;
+bool refresh_screen_flag;
 
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
@@ -197,9 +197,9 @@ void thread_lcd(void)
 		while(1)
 		{
 //----------------------------------------------------------------------------- gta theme			
-			if((device_theme!=display_theme)||(refresh_screen_flag==1))
+			if((device_theme!=display_theme)||(refresh_screen_flag==true))
 			{
-				refresh_screen_flag=0;
+				refresh_screen_flag=false;
 
 				if(device_theme==THEME_GTA)
 				{

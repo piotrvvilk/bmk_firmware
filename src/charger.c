@@ -42,7 +42,7 @@ void thread_charger(void)
 {
 	while(1)
 	{
-		usb_detection_on();
+		usb_detection_on();																	//turn on voltage divider
 
 		if(gpio_pin_get_dt(&usbdet)==0)                                                		//USB disconnected
 		{
@@ -58,8 +58,8 @@ void thread_charger(void)
 			if(usb_pin_old_state!=usb_pin_state)											//detect when pin state is change
 			{
 				usb_pin_old_state=usb_pin_state;
-				refresh_screen_flag=1;														//only once after connected usb cable
-				refresh_led_flag=1;											
+				refresh_screen_flag=true;													//only once after connected usb cable
+				refresh_led_flag=true;											
 			}
 
 		}
@@ -73,8 +73,8 @@ void thread_charger(void)
 			if(usb_pin_old_state!=usb_pin_state)											//detect when pin state is change
 			{
 				usb_pin_old_state=usb_pin_state;
-				refresh_screen_flag=1;														//only once after disconnected usb cable
-				refresh_led_flag=1;											
+				refresh_screen_flag=true;													//only once after disconnected usb cable
+				refresh_led_flag=true;											
 			}
 
 
@@ -98,8 +98,8 @@ void thread_charger(void)
 				if(charging_pin_old_state!=charging_pin_state)								//detect when pin state is change
 				{
 					charging_pin_old_state=charging_pin_state;
-					refresh_screen_flag=1;													//only once after stop charging
-					refresh_led_flag=1;											
+					refresh_screen_flag=true;												//only once after stop charging
+					refresh_led_flag=true;											
 				}
 			}
 			else                                                                            //still charging	
@@ -115,13 +115,12 @@ void thread_charger(void)
 				if(charging_pin_old_state!=charging_pin_state)								//detect when pin state is change
 				{
 					charging_pin_old_state=charging_pin_state;
-					refresh_screen_flag=1;													//only once after start charging
-					refresh_led_flag=1;											
+					refresh_screen_flag=true;												//only once after start charging
+					refresh_led_flag=true;											
 				}
-
 			}
 		}
-		usb_detection_off();
+		usb_detection_off();																//turn off voltage divider
 		k_msleep(1000);
 
 	}
