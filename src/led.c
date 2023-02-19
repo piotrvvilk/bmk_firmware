@@ -74,10 +74,10 @@ uint8_t led_theme;
 int err;
 const struct device *led_pwm;
 
-uint32_t led_demo_counter;													//charging counter - led on keypad (time between following sequences )
+//uint32_t led_demo_counter;													//charging counter - led on keypad (time between following sequences )
 uint32_t led_pwm_counter;													//charging counter - led on bottom side 
 
-uint32_t led_strip_charged_counter;											//time between next strip driving when batt is charged (prevent led driving all the time) 
+//uint32_t led_strip_charged_counter;											//time between next strip driving when batt is charged (prevent led driving all the time) 
 uint32_t led_pwm_charged_counter;											//time between next led pwm driving when batt is charged (--||--)
 
 bool refresh_led_flag;														//refresh led after usb cable or chargin state is changed	
@@ -359,7 +359,7 @@ void thread_led(void)
 //-------------------------------------------------------------------------------------- battery charged: demo on bottom leds 
 		if(charger_data.charger_status==CHARGER_DONE)
 		{
-			led_strip_charged_counter=0;
+			//led_strip_charged_counter=0;
 			if(led_pwm_charged_counter==0)												//prevent led driving all the time
 			{
 				led_set_brightness(led_pwm, LED_GREEN_PWM, 50);			

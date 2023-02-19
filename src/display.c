@@ -43,7 +43,9 @@ bool refresh_screen_flag;
 
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
-static uint32_t get_color_value(uint8_t battery_val){
+//==================================================================================================================================================
+static uint32_t get_color_value(uint8_t battery_val)
+{
 	if (battery_val < 6) return 0xFF0000;
 	if (battery_val < 16) return 0x0000FF;
 	return 0x00FF00;
@@ -66,18 +68,7 @@ static void display_battery(uint8_t battery_val)				//dispaly battery and usb pl
     }
 
 //-------------------------------------------------------------- battery value font color    
-    if(battery_val>15)
-    {
-        color=0x00FF00;
-    }
-    else if((battery_val>5)&&(battery_val<16))
-    {
-        color=0x0000FF;
-    }
-    else if(battery_val<6)
-    {
-        color=0xFF0000;
-    }
+	color = get_color_value(battery_val);
     
     if(digits[0]=='0')
     {
@@ -121,13 +112,13 @@ static void display_battery(uint8_t battery_val)				//dispaly battery and usb pl
 	lv_label_set_text(label3, digits);
 	lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(color), LV_PART_MAIN);
 	
-	if(digits[0]='1')											//position correction
+	if(digits[0]=='1')											//position correction
 	{
 		lv_obj_align(label3, LV_ALIGN_CENTER, 5, -44);	
 	}
 	else
 	{
-		lv_obj_align(label3, LV_ALIGN_CENTER, 0, -44);
+		lv_obj_align(label3, LV_ALIGN_CENTER, 3, -44);
 	}
 }
 

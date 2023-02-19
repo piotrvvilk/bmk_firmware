@@ -35,8 +35,8 @@
 #define     FADE_DELAY_MS	                10
 #define     FADE_DELAY	                    K_MSEC(FADE_DELAY_MS)
 
-extern uint32_t led_strip_charged_counter;	
-extern uint32_t led_pwm_charged_counter;
+extern uint32_t led_pwm_charged_counter;	
+extern uint32_t led_pwm_counter;
 
 extern bool refresh_led_flag;
 

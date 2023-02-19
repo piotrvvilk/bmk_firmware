@@ -1120,7 +1120,7 @@ void main(void)
 			device_theme=NO_THEME;								//turn off display, led strip and led pwm
 			device_state=BMK_STANDBY; 
 			led_pwm_charged_counter=0;
-			led_strip_charged_counter=0;
+			//led_strip_charged_counter=0;
 		}
 
 		k_sleep(K_MSEC(100));

@@ -35,6 +35,7 @@ uint32_t 			usb_pin_state;
 uint32_t 			usb_pin_old_state;
 uint32_t 			charging_pin_state;
 uint32_t 			charging_pin_old_state;
+bool 				charger_locked;
 
 
 //==================================================================================================================================================
@@ -53,6 +54,7 @@ void thread_charger(void)
 			charger_data.usb_status = USB_DISCONNECTED;
 			charger_data.charger_status = CHARGER_DISABLE;
 			charger_off();
+			charger_locked=false;
 
 			usb_pin_state=0;
 			if(usb_pin_old_state!=usb_pin_state)											//detect when pin state is change
@@ -92,6 +94,7 @@ void thread_charger(void)
 				if(charger_data.charged_counter>2)                                      	//nie pokazuj od razu ze naladowane                
 				{
 				 	charger_data.charger_status = CHARGER_DONE;
+					charger_locked=true;													//lock when charger finishing job	
 				}
 
 				charging_pin_state=0;
@@ -99,24 +102,29 @@ void thread_charger(void)
 				{
 					charging_pin_old_state=charging_pin_state;
 					refresh_screen_flag=true;												//only once after stop charging
-					refresh_led_flag=true;											
+					refresh_led_flag=true;
+					led_pwm_counter=0;											
 				}
 			}
 			else                                                                            //still charging	
 			{
-				#ifdef DEBUG_LOG_CHARGER
-					LOG_INF("CHARGING\n");
-				#endif
-
-				charger_data.charged_counter=0;
-				charger_data.charger_status = CHARGER_CHARGING;	
-
-				charging_pin_state=1;
-				if(charging_pin_old_state!=charging_pin_state)								//detect when pin state is change
+				if(charger_locked==false)													//only when charger is not locked
 				{
-					charging_pin_old_state=charging_pin_state;
-					refresh_screen_flag=true;												//only once after start charging
-					refresh_led_flag=true;											
+					#ifdef DEBUG_LOG_CHARGER
+						LOG_INF("CHARGING\n");
+					#endif
+
+					charger_data.charged_counter=0;
+					charger_data.charger_status = CHARGER_CHARGING;	
+
+					charging_pin_state=1;
+					if(charging_pin_old_state!=charging_pin_state)							//detect when pin state is change
+					{
+						charging_pin_old_state=charging_pin_state;
+						refresh_screen_flag=true;											//only once after start charging
+						refresh_led_flag=true;	
+						led_pwm_counter=0;											
+					}
 				}
 			}
 		}
