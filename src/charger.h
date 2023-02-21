@@ -16,9 +16,14 @@
 //------------------------------------------------------- types
 typedef struct charger_data
 {
-    uint32_t            usb_status;					    
-    uint32_t            charger_status;					
-    uint32_t            charged_counter;
+    uint32_t            usb_status;		                    //connected/disconnected 			    
+    uint32_t            charger_status;					    //charging/cherged/disable    
+    uint32_t            charged_counter;                    //auxliary counter
+    uint32_t 			usb_pin_state;                      //generating event after usb state change
+    uint32_t 			usb_pin_old_state;                  //
+    uint32_t 			charging_pin_state;                 //generating event after charger state change
+    uint32_t 			charging_pin_old_state;             //
+    bool 				charger_locked;                     //true when charged first time, prevent continuous switch between charging and charged 
 }charger_data_t;
 
 //------------------------------------------------------- global variables

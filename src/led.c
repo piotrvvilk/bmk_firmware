@@ -132,16 +132,6 @@ int set_button_pattern(const uint8_t *pattern)
 	return rc;
 }
 
-// //=================================================================================================================
-// int turn_off_all_buttons(void)
-// {
-// 	int rc;
-
-// 	memcpy(&my_pix.data, &turn_off_pattern, 40);
-// 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
-// 	return rc;
-// }
-
 //=================================================================================================================
 int set_pattern_without_one_button(uint32_t position)
 {
@@ -359,7 +349,6 @@ void thread_led(void)
 //-------------------------------------------------------------------------------------- battery charged: demo on bottom leds 
 		if(charger_data.charger_status==CHARGER_DONE)
 		{
-			//led_strip_charged_counter=0;
 			if(led_pwm_charged_counter==0)												//prevent led driving all the time
 			{
 				led_set_brightness(led_pwm, LED_GREEN_PWM, 50);			
