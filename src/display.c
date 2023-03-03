@@ -43,11 +43,12 @@ bool refresh_screen_flag;
 
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
+#ifdef USE_DISPLAY
 //==================================================================================================================================================
 static uint32_t get_color_value(uint8_t battery_val)
 {
 	if (battery_val < 6) return 0xFF0000;
-	if (battery_val < 16) return 0x0000FF;
+	if (battery_val < 16) return 0xFFFF00;
 	return 0x00FF00;
 }
 
@@ -164,7 +165,6 @@ void display_info_screen(void)
 //==================================================================================================================================================
 void thread_lcd(void)
 {
-	#ifdef USE_DISPLAY
 //----------------------------------------------------------------------------- display init
 		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
@@ -253,9 +253,10 @@ void thread_lcd(void)
 			k_msleep(100);
 		}
 
-	#endif
-	
 }
+
+
+#endif
 
 //==================================================================================================================================================
 

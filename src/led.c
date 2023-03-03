@@ -28,6 +28,7 @@
 #include "config_app.h"
 #include "charger.h"
 
+
 LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 
 //--------------------------------------------------------------------------- LED STRIP
@@ -81,6 +82,7 @@ uint32_t led_pwm_counter;													//charging counter - led on bottom side
 uint32_t led_pwm_charged_counter;											//time between next led pwm driving when batt is charged (--||--)
 
 bool refresh_led_flag;														//refresh led after usb cable or chargin state is changed	
+
 
 //=================================================================================================================
 int led_pwm_init(void)

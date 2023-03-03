@@ -40,7 +40,6 @@
 #include "lis2dh/lis2dh.h"
 #include "charger.h"
 
-//#define WORQ_THREAD_STACK_SIZE  			512
 
 #define DEVICE_NAME     					CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN 					(sizeof(DEVICE_NAME) - 1)
@@ -115,9 +114,6 @@ LOG_MODULE_REGISTER(my_bmk_main,LOG_LEVEL_DBG);
 /* HIDS instance. */
 BT_HIDS_DEF(hids_obj, OUTPUT_REPORT_MAX_LEN, INPUT_REPORT_KEYS_MAX_LEN);
 
-// Define stack area used by workqueue thread
-//static K_THREAD_STACK_DEFINE(my_stack_area, WORQ_THREAD_STACK_SIZE);
-
 static volatile bool is_adv;
 
 static const struct bt_data ad[] = {
@@ -138,14 +134,14 @@ static struct conn_mode {
 	bool in_boot_mode;
 } conn_mode[CONFIG_BT_HIDS_MAX_CLIENT_COUNT];
 
-// static const uint8_t hello_world_str[] = {
-// 	0x0b,	/* Key h */
-// 	0x08,	/* Key e */
-// 	0x0f,	/* Key l */
-// 	0x0f,	/* Key l */
-// 	0x12,	/* Key o */
-// 	0x28,	/* Key Return */
-// };
+ static const uint8_t hello_world_str[] = {
+ 	0x0b,	/* Key h */
+ 	0x08,	/* Key e */
+ 	0x0f,	/* Key l */
+ 	0x0f,	/* Key l */
+ 	0x12,	/* Key o */
+ 	0x28,	/* Key Return */
+ };
 
 static const uint8_t shift_key[] = { 225 };
 
@@ -166,10 +162,7 @@ struct pairing_data_mitm {
 	unsigned int passkey;
 };
 
-K_MSGQ_DEFINE(mitm_queue,
-	      sizeof(struct pairing_data_mitm),
-	      CONFIG_BT_HIDS_MAX_CLIENT_COUNT,
-	      4);
+K_MSGQ_DEFINE(mitm_queue, sizeof(struct pairing_data_mitm), CONFIG_BT_HIDS_MAX_CLIENT_COUNT, 4);
 
 uint32_t     device_active_counter;		  
 uint32_t     device_state;
@@ -204,33 +197,6 @@ static void advertising_start(void)
 }
 
 //==================================================================================================================================================
-// #if CONFIG_NFC_OOB_PAIRING
-// static void delayed_advertising_start(struct k_work *work)
-// {
-// 	advertising_start();
-// }
-
-
-// void nfc_field_detected(void)
-// {
-// 	dk_set_led_on(NFC_LED);
-
-// 	for (int i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-// 		if (!conn_mode[i].conn) {
-// 			k_work_submit(&adv_work);
-// 			break;
-// 		}
-// 	}
-// }
-
-
-// void nfc_field_lost(void)
-// {
-// 	dk_set_led_off(NFC_LED);
-// }
-// #endif
-
-//==================================================================================================================================================
 static void pairing_process(struct k_work *work)
 {
 	int err;
@@ -239,12 +205,12 @@ static void pairing_process(struct k_work *work)
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	err = k_msgq_peek(&mitm_queue, &pairing_data);
-	if (err) {
+	if (err) 
+	{
 		return;
 	}
 
-	bt_addr_le_to_str(bt_conn_get_dst(pairing_data.conn),
-			  addr, sizeof(addr));
+	bt_addr_le_to_str(bt_conn_get_dst(pairing_data.conn), addr, sizeof(addr));
 
 	LOG_INF("Passkey for %s: %06u\n", addr, pairing_data.passkey);
 	LOG_INF("Press Button 1 to confirm, Button 2 to reject.\n");
@@ -272,8 +238,10 @@ static void connected(struct bt_conn *conn, uint8_t err)
 		return;
 	}
 
-	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-		if (!conn_mode[i].conn) {
+	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
+	{
+		if (!conn_mode[i].conn) 
+		{
 			conn_mode[i].conn = conn;
 			conn_mode[i].in_boot_mode = false;
 			break;
@@ -282,8 +250,10 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 //==================================================================================================================================================
 #if CONFIG_NFC_OOB_PAIRING == 0
-	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-		if (!conn_mode[i].conn) {
+	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
+	{
+		if (!conn_mode[i].conn) 
+		{
 			advertising_start();
 			return;
 		}
@@ -336,8 +306,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 }
 
 //==================================================================================================================================================
-static void security_changed(struct bt_conn *conn, bt_security_t level,
-			     enum bt_security_err err)
+static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
@@ -366,9 +335,7 @@ static void caps_lock_handler(const struct bt_hids_rep *rep)
 }
 
 //==================================================================================================================================================
-static void hids_outp_rep_handler(struct bt_hids_rep *rep,
-				  struct bt_conn *conn,
-				  bool write)
+static void hids_outp_rep_handler(struct bt_hids_rep *rep, struct bt_conn *conn, bool write)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
@@ -383,9 +350,7 @@ static void hids_outp_rep_handler(struct bt_hids_rep *rep,
 }
 
 //==================================================================================================================================================
-static void hids_boot_kb_outp_rep_handler(struct bt_hids_rep *rep,
-					  struct bt_conn *conn,
-					  bool write)
+static void hids_boot_kb_outp_rep_handler(struct bt_hids_rep *rep, struct bt_conn *conn, bool write)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
@@ -400,8 +365,7 @@ static void hids_boot_kb_outp_rep_handler(struct bt_hids_rep *rep,
 }
 
 //==================================================================================================================================================
-static void hids_pm_evt_handler(enum bt_hids_pm_evt evt,
-				struct bt_conn *conn)
+static void hids_pm_evt_handler(enum bt_hids_pm_evt evt, struct bt_conn *conn)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 	size_t i;
@@ -569,36 +533,6 @@ static void auth_cancel(struct bt_conn *conn)
 }
 
 //==================================================================================================================================================
-#if CONFIG_NFC_OOB_PAIRING
-static void auth_oob_data_request(struct bt_conn *conn,
-				  struct bt_conn_oob_info *info)
-{
-	int err;
-	struct bt_le_oob *oob_local = app_nfc_oob_data_get();
-
-	printk("LESC OOB data requested\n");
-
-	if (info->type != BT_CONN_OOB_LE_SC) {
-		printk("Only LESC pairing supported\n");
-		return;
-	}
-
-	if (info->lesc.oob_config != BT_CONN_OOB_LOCAL_ONLY) {
-		printk("LESC OOB config not supported\n");
-		return;
-	}
-
-	/* Pass only local OOB data. */
-	err = bt_le_oob_set_sc_data(conn, &oob_local->le_sc_data, NULL);
-	if (err) {
-		printk("Error while setting OOB data: %d\n", err);
-	} else {
-		printk("Successfully provided LESC OOB data\n");
-	}
-}
-#endif
-
-//==================================================================================================================================================
 static void pairing_complete(struct bt_conn *conn, bool bonded)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
@@ -638,12 +572,13 @@ static struct bt_conn_auth_cb conn_auth_callbacks = {
 #endif
 };
 
+//==================================================================================================================================================
 static struct bt_conn_auth_info_cb conn_auth_info_callbacks = {
 	.pairing_complete = pairing_complete,
 	.pairing_failed = pairing_failed
 };
 
-
+//==================================================================================================================================================
 /** @brief Function process keyboard state and sends it
  *
  *  @param pstate     The state to be sent
@@ -681,6 +616,7 @@ static int key_report_con_send(const struct keyboard_state *state,
 	return err;
 }
 
+//==================================================================================================================================================
 /** @brief Function process and send keyboard state to all active connections
  *
  * Function process global keyboard state and send it to all connected
@@ -921,16 +857,7 @@ static void num_comp_reply(bool accept)
 //==================================================================================================================================================
 static void bas_notify(void)
 {
-	uint8_t battery_level = bt_bas_get_battery_level();
-
-	battery_level--;
-
-	if(!battery_level) 
-	{
-		battery_level = 100U;
-	}
-
-	bt_bas_set_battery_level(battery_level);
+	bt_bas_set_battery_level(max17048_charge);
 }
 
 
@@ -940,8 +867,6 @@ static void bas_notify(void)
 
 
 //==================================================================================================================================================
-
-
 // static void button_changed(uint32_t button_state, uint32_t has_changed)
 // {
 // 	static bool pairing_button_pressed;
@@ -1052,78 +977,82 @@ void main(void)
 	}
 
 //-------------------------------------------------------------------------- BLE
-#ifdef USE_BLE	
-	err = bt_conn_auth_cb_register(&conn_auth_callbacks);
-	if(err) 
-	{
-		LOG_INF("Failed to register authorization callbacks.\n");
-		return;
-	}
+	#ifdef USE_BLE	
+		err = bt_conn_auth_cb_register(&conn_auth_callbacks);
+		if(err) 
+		{
+			LOG_INF("Failed to register authorization callbacks.\n");
+			return;
+		}
 
-	err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
-	if(err) 
-	{
-		LOG_INF("Failed to register authorization info callbacks.\n");
-		return;
-	}
+		err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
+		if(err) 
+		{
+			LOG_INF("Failed to register authorization info callbacks.\n");
+			return;
+		}
 
-	err = bt_enable(NULL);
-	if(err) 
-	{
-		LOG_INF("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
+		err = bt_enable(NULL);
+		if(err) 
+		{
+			LOG_INF("Bluetooth init failed (err %d)\n", err);
+			return;
+		}
 
-	LOG_INF("Bluetooth initialized\n");
+		LOG_INF("Bluetooth initialized\n");
 
-	hid_init();
+		hid_init();
 
-	if (IS_ENABLED(CONFIG_SETTINGS)) 
-	{
-		settings_load();
-	}
+		if (IS_ENABLED(CONFIG_SETTINGS)) 
+		{
+			settings_load();
+		}
 
- 	advertising_start();
+		advertising_start();
 
- 	k_work_init(&pairing_work, pairing_process);
-#endif
+		k_work_init(&pairing_work, pairing_process);
+	#endif
 	
 //==================================================================================================================================================
 	while (1) 
 	{
 
 //-------------------------------------------------------------- lis2dh interrupt		
-		if(lis_int1_flag)										
-		{
-			lis_int1_flag=false;
-			release_interrupt();		
-			device_active_time_reset();							//start counting
-			device_state=BMK_ACTIVE;
-			
-			if(device_theme==NO_THEME)							//restore last theme
+		#ifdef USE_LIS2DH 
+			if(lis_int1_flag)										
 			{
-				device_theme = last_theme;
-			}
-			
-		}	
+				lis_int1_flag=false;
+				release_interrupt();		
+				device_active_time_reset();							//start counting
+				device_state=BMK_ACTIVE;
+				
+				if(device_theme==NO_THEME)							//restore last theme
+				{
+					device_theme = last_theme;
+				}
+				
+			}	
+		#endif	
 //--------------------------------------------------------------- timeout
-		if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
+		#ifdef USE_LED 
+			if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
 
-		if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
-		{
-			#ifdef DEBUG_LOG_DEVICE
-				LOG_INF("Timeout\n");		
-			#endif
-			
-			device_active_time_stop();
-			last_theme=device_theme;							//remember last theme 
-			device_theme=NO_THEME;								//turn off display, led strip and led pwm
-			device_state=BMK_STANDBY; 
-			led_pwm_charged_counter=0;
-			//led_strip_charged_counter=0;
-		}
+			if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
+			{
+				#ifdef DEBUG_LOG_DEVICE
+					LOG_INF("Timeout\n");		
+				#endif
+				
+				device_active_time_stop();
+				last_theme=device_theme;							//remember last theme 
+				device_theme=NO_THEME;								//turn off display, led strip and led pwm
+				device_state=BMK_STANDBY; 
+				led_pwm_charged_counter=0;
+			}
+		#endif
 
-		k_sleep(K_MSEC(100));
+//--------------------------------------------------------------- 
+		k_sleep(K_MSEC(1000));
     }
 	
 }

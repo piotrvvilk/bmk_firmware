@@ -10,6 +10,9 @@
 //SPI3, LCD
 //MISO: P0.14 (SIO14)
 
+//sio26 
+//sio28
+
 
 //nrf_gpio_cfg_input(CHRG_MON, NRF_GPIO_PIN_PULLUP);
 //nrf_gpio_cfg_input(USB_DETECT, NRF_GPIO_PIN_NOPULL);
