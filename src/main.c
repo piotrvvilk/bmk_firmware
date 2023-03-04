@@ -164,8 +164,12 @@ struct pairing_data_mitm {
 
 K_MSGQ_DEFINE(mitm_queue, sizeof(struct pairing_data_mitm), CONFIG_BT_HIDS_MAX_CLIENT_COUNT, 4);
 
-uint32_t     device_active_counter;		  
-uint32_t     device_state;
+volatile uint32_t     	device_active_counter;		  
+volatile uint32_t     	display_default_counter;		  
+volatile uint32_t     	device_state;
+volatile uint32_t 		lcd_pairing_state;
+volatile uint32_t 		led_pairing_state;
+uint32_t				bas_counter;
 
 //==================================================================================================================================================
 //==================================================================================================================================================
@@ -212,6 +216,9 @@ static void pairing_process(struct k_work *work)
 
 	bt_addr_le_to_str(bt_conn_get_dst(pairing_data.conn), addr, sizeof(addr));
 
+	lcd_pairing_state = PAIRING;
+	led_pairing_state = PAIRING;
+
 	LOG_INF("Passkey for %s: %06u\n", addr, pairing_data.passkey);
 	LOG_INF("Press Button 1 to confirm, Button 2 to reject.\n");
 }
@@ -223,18 +230,26 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	if (err) {
+	if (err) 
+	{
+		lcd_pairing_state = PAIRING_ERROR;
+		led_pairing_state = PAIRING_ERROR;
 		LOG_INF("Failed to connect to %s (%u)\n", addr, err);
 		return;
 	}
 
 	LOG_INF("Connected %s\n", addr);
-	//dk_set_led_on(CON_STATUS_LED);
+	
+	lcd_pairing_state = PAIRED;
+	led_pairing_state = PAIRED;
 
 	err = bt_hids_connected(&hids_obj, conn);
 
-	if (err) {
-		//printk("Failed to notify HID service about connection\n");
+	if (err) 
+	{
+		lcd_pairing_state = PAIRING_ERROR;
+		led_pairing_state = PAIRING_ERROR;
+		LOG_INF("Failed to notify HID service about connection\n");
 		return;
 	}
 
@@ -248,8 +263,6 @@ static void connected(struct bt_conn *conn, uint8_t err)
 		}
 	}
 
-//==================================================================================================================================================
-#if CONFIG_NFC_OOB_PAIRING == 0
 	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
 	{
 		if (!conn_mode[i].conn) 
@@ -258,7 +271,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 			return;
 		}
 	}
-#endif
+
 	is_adv = false;
 }
 
@@ -275,15 +288,21 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 	err = bt_hids_disconnected(&hids_obj, conn);
 
-	if (err) {
+	if (err) 
+	{
 		LOG_INF("Failed to notify HID service about disconnection\n");
 	}
 
-	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-		if (conn_mode[i].conn == conn) {
+	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
+	{
+		if (conn_mode[i].conn == conn) 
+		{
 			conn_mode[i].conn = NULL;
-		} else {
-			if (conn_mode[i].conn) {
+		} 
+		else 
+		{
+			if (conn_mode[i].conn) 
+			{
 				is_any_dev_connected = true;
 			}
 		}
@@ -294,15 +313,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		//dk_set_led_off(CON_STATUS_LED);
 	}
 
-#if CONFIG_NFC_OOB_PAIRING
-	if (is_adv) {
-		printk("Advertising stopped after disconnect\n");
-		bt_le_adv_stop();
-		is_adv = false;
-	}
-#else
 	advertising_start();
-#endif
 }
 
 //==================================================================================================================================================
@@ -312,9 +323,12 @@ static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	if (!err) {
+	if (!err) 
+	{
 		LOG_INF("Security changed: %s level %u\n", addr, level);
-	} else {
+	} 
+	else 
+	{
 		LOG_INF("Security failed: %s level %u err %d\n", addr, level,err);
 	}
 }
@@ -329,8 +343,7 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 //==================================================================================================================================================
 static void caps_lock_handler(const struct bt_hids_rep *rep)
 {
-	uint8_t report_val = ((*rep->data) & OUTPUT_REPORT_BIT_MASK_CAPS_LOCK) ?
-			  1 : 0;
+	uint8_t report_val = ((*rep->data) & OUTPUT_REPORT_BIT_MASK_CAPS_LOCK) ? 1 : 0;
 	//dk_set_led(LED_CAPS_LOCK, report_val);
 }
 
@@ -339,7 +352,8 @@ static void hids_outp_rep_handler(struct bt_hids_rep *rep, struct bt_conn *conn,
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
-	if (!write) {
+	if (!write) 
+	{
 		LOG_INF("Output report read\n");
 		return;
 	};
@@ -354,7 +368,8 @@ static void hids_boot_kb_outp_rep_handler(struct bt_hids_rep *rep, struct bt_con
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
-	if (!write) {
+	if (!write)
+	{
 		LOG_INF("Output report read\n");
 		return;
 	};
@@ -370,32 +385,36 @@ static void hids_pm_evt_handler(enum bt_hids_pm_evt evt, struct bt_conn *conn)
 	char addr[BT_ADDR_LE_STR_LEN];
 	size_t i;
 
-	for (i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-		if (conn_mode[i].conn == conn) {
+	for(i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
+	{
+		if (conn_mode[i].conn == conn) 
+		{
 			break;
 		}
 	}
 
-	if (i >= CONFIG_BT_HIDS_MAX_CLIENT_COUNT) {
+	if(i >= CONFIG_BT_HIDS_MAX_CLIENT_COUNT) 
+	{
 		LOG_INF("Cannot find connection handle when processing PM");
 		return;
 	}
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	switch (evt) {
-	case BT_HIDS_PM_EVT_BOOT_MODE_ENTERED:
-		LOG_INF("Boot mode entered %s\n", addr);
-		conn_mode[i].in_boot_mode = true;
-		break;
+	switch (evt) 
+	{
+		case BT_HIDS_PM_EVT_BOOT_MODE_ENTERED:
+			LOG_INF("Boot mode entered %s\n", addr);
+			conn_mode[i].in_boot_mode = true;
+			break;
 
-	case BT_HIDS_PM_EVT_REPORT_MODE_ENTERED:
-		LOG_INF("Report mode entered %s\n", addr);
-		conn_mode[i].in_boot_mode = false;
-		break;
+		case BT_HIDS_PM_EVT_REPORT_MODE_ENTERED:
+			LOG_INF("Report mode entered %s\n", addr);
+			conn_mode[i].in_boot_mode = false;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -507,7 +526,8 @@ static void auth_passkey_confirm(struct bt_conn *conn, unsigned int passkey)
 	pairing_data.passkey = passkey;
 
 	err = k_msgq_put(&mitm_queue, &pairing_data, K_NO_WAIT);
-	if (err) {
+	if (err) 
+	{
 		//printk("Pairing queue is full. Purge previous data.\n");
 	}
 
@@ -517,7 +537,8 @@ static void auth_passkey_confirm(struct bt_conn *conn, unsigned int passkey)
 	 * the same time. Passkey confirmation for next devices will
 	 * be proccess from queue after handling the earlier ones.
 	 */
-	if (k_msgq_num_used_get(&mitm_queue) == 1) {
+	if (k_msgq_num_used_get(&mitm_queue) == 1) 
+	{
 		k_work_submit(&pairing_work);
 	}
 }
@@ -529,6 +550,11 @@ static void auth_cancel(struct bt_conn *conn)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
+	lcd_pairing_state = NO_ACTION;
+	led_pairing_state = NO_ACTION; 
+	device_theme=THEME_INFO;
+	device_state=BMK_ACTIVE;
+
 	LOG_INF("Pairing cancelled: %s\n", addr);
 }
 
@@ -539,6 +565,10 @@ static void pairing_complete(struct bt_conn *conn, bool bonded)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
+	lcd_pairing_state = PAIRED;
+	led_pairing_state = PAIRED; 
+	display_default_time_reset();
+
 	LOG_INF("Pairing completed: %s, bonded: %d\n", addr, bonded);
 }
 
@@ -548,16 +578,23 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 	char addr[BT_ADDR_LE_STR_LEN];
 	struct pairing_data_mitm pairing_data;
 
-	if (k_msgq_peek(&mitm_queue, &pairing_data) != 0) {
+	if (k_msgq_peek(&mitm_queue, &pairing_data) != 0) 
+	{
 		return;
 	}
 
-	if (pairing_data.conn == conn) {
+	if (pairing_data.conn == conn) 
+	{
 		bt_conn_unref(pairing_data.conn);
 		k_msgq_get(&mitm_queue, &pairing_data, K_NO_WAIT);
 	}
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+	lcd_pairing_state = NO_ACTION;
+	led_pairing_state = NO_ACTION; 
+	device_theme=THEME_INFO;
+	device_state=BMK_ACTIVE;
 
 	LOG_INF("Pairing failed conn: %s, reason %d\n", addr, reason);
 }
@@ -567,9 +604,6 @@ static struct bt_conn_auth_cb conn_auth_callbacks = {
 	.passkey_display = auth_passkey_display,
 	.passkey_confirm = auth_passkey_confirm,
 	.cancel = auth_cancel,
-#if CONFIG_NFC_OOB_PAIRING
-	.oob_data_request = auth_oob_data_request,
-#endif
 };
 
 //==================================================================================================================================================
@@ -602,17 +636,20 @@ static int key_report_con_send(const struct keyboard_state *state,
 	key_data = &data[2];
 	key_state = state->keys_state;
 
-	for (n = 0; n < KEY_PRESS_MAX; ++n) {
+	for (n = 0; n < KEY_PRESS_MAX; ++n) 
+	{
 		*key_data++ = *key_state++;
 	}
-	if (boot_mode) {
-		err = bt_hids_boot_kb_inp_rep_send(&hids_obj, conn, data,
-							sizeof(data), NULL);
-	} else {
-		err = bt_hids_inp_rep_send(&hids_obj, conn,
-						INPUT_REP_KEYS_IDX, data,
-						sizeof(data), NULL);
+
+	if(boot_mode) 
+	{
+		err = bt_hids_boot_kb_inp_rep_send(&hids_obj, conn, data, sizeof(data), NULL);
+	} 
+	else 
+	{
+		err = bt_hids_inp_rep_send(&hids_obj, conn,	INPUT_REP_KEYS_IDX, data, sizeof(data), NULL);
 	}
+
 	return err;
 }
 
@@ -626,14 +663,15 @@ static int key_report_con_send(const struct keyboard_state *state,
  */
 static int key_report_send(void)
 {
-	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-		if (conn_mode[i].conn) {
+	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
+	{
+		if(conn_mode[i].conn) 
+		{
 			int err;
 
-			err = key_report_con_send(&hid_keyboard_state,
-						  conn_mode[i].in_boot_mode,
-						  conn_mode[i].conn);
-			if (err) {
+			err = key_report_con_send(&hid_keyboard_state, conn_mode[i].in_boot_mode, conn_mode[i].conn);
+			if (err) 
+			{
 				LOG_INF("Key report send error: %d\n", err);
 				return err;
 			}
@@ -655,7 +693,8 @@ static int key_report_send(void)
  */
 static uint8_t button_ctrl_code(uint8_t key)
 {
-	if (KEY_CTRL_CODE_MIN <= key && key <= KEY_CTRL_CODE_MAX) {
+	if (KEY_CTRL_CODE_MIN <= key && key <= KEY_CTRL_CODE_MAX) 
+	{
 		return (uint8_t)(1U << (key - KEY_CTRL_CODE_MIN));
 	}
 	return 0;
@@ -666,12 +705,16 @@ static int hid_kbd_state_key_set(uint8_t key)
 {
 	uint8_t ctrl_mask = button_ctrl_code(key);
 
-	if (ctrl_mask) {
+	if (ctrl_mask) 
+	{
 		hid_keyboard_state.ctrl_keys_state |= ctrl_mask;
 		return 0;
 	}
-	for (size_t i = 0; i < KEY_CTRL_CODE_MAX; ++i) {
-		if (hid_keyboard_state.keys_state[i] == 0) {
+
+	for (size_t i = 0; i < KEY_CTRL_CODE_MAX; ++i) 
+	{
+		if (hid_keyboard_state.keys_state[i] == 0) 
+		{
 			hid_keyboard_state.keys_state[i] = key;
 			return 0;
 		}
@@ -685,12 +728,16 @@ static int hid_kbd_state_key_clear(uint8_t key)
 {
 	uint8_t ctrl_mask = button_ctrl_code(key);
 
-	if (ctrl_mask) {
+	if (ctrl_mask) 
+	{
 		hid_keyboard_state.ctrl_keys_state &= ~ctrl_mask;
 		return 0;
 	}
-	for (size_t i = 0; i < KEY_CTRL_CODE_MAX; ++i) {
-		if (hid_keyboard_state.keys_state[i] == key) {
+
+	for (size_t i = 0; i < KEY_CTRL_CODE_MAX; ++i) 
+	{
+		if (hid_keyboard_state.keys_state[i] == key) 
+		{
 			hid_keyboard_state.keys_state[i] = 0;
 			return 0;
 		}
@@ -710,11 +757,13 @@ static int hid_kbd_state_key_clear(uint8_t key)
  */
 static int hid_buttons_press(const uint8_t *keys, size_t cnt)
 {
-	while (cnt--) {
+	while (cnt--)
+	{
 		int err;
 
 		err = hid_kbd_state_key_set(*keys++);
-		if (err) {
+		if (err) 
+		{
 			LOG_INF("Cannot set selected key.\n");
 			return err;
 		}
@@ -734,11 +783,13 @@ static int hid_buttons_press(const uint8_t *keys, size_t cnt)
  */
 static int hid_buttons_release(const uint8_t *keys, size_t cnt)
 {
-	while (cnt--) {
+	while (cnt--) 
+	{
 		int err;
 
 		err = hid_kbd_state_key_clear(*keys++);
-		if (err) {
+		if (err) 
+		{
 			LOG_INF("Cannot clear selected key.\n");
 			return err;
 		}
@@ -773,34 +824,38 @@ static int hid_buttons_release(const uint8_t *keys, size_t cnt)
 // }
 
 //==================================================================================================================================================
-static void num_comp_reply(bool accept)
+void num_comp_reply(bool accept)
 {
 	struct pairing_data_mitm pairing_data;
 	struct bt_conn *conn;
 
-	if (k_msgq_get(&mitm_queue, &pairing_data, K_NO_WAIT) != 0) {
+	if (k_msgq_get(&mitm_queue, &pairing_data, K_NO_WAIT) != 0) 
+	{
 		return;
 	}
 
 	conn = pairing_data.conn;
 
-	if (accept) {
+	if (accept) 
+	{
 		bt_conn_auth_passkey_confirm(conn);
-		//LOG_INF("Numeric Match, conn %p\n", conn);
-	} else {
+		LOG_INF("Numeric Match");
+	} 
+	else 
+	{
 		bt_conn_auth_cancel(conn);
-		//LOG_INF("Numeric Reject, conn %p\n", conn);
+		LOG_INF("Numeric Reject");
 	}
 
 	bt_conn_unref(pairing_data.conn);
 
-	if (k_msgq_num_used_get(&mitm_queue)) {
+	if (k_msgq_num_used_get(&mitm_queue)) 
+	{
 		k_work_submit(&pairing_work);
 	}
 }
 
 //==================================================================================================================================================
-
 // static void button_changed(uint32_t button_state, uint32_t has_changed)
 // {
 // 	static bool pairing_button_pressed;
@@ -860,34 +915,8 @@ static void bas_notify(void)
 	bt_bas_set_battery_level(max17048_charge);
 }
 
-
 //==================================================================================================================================================
 
-
-
-
-//==================================================================================================================================================
-// static void button_changed(uint32_t button_state, uint32_t has_changed)
-// {
-// 	static bool pairing_button_pressed;
-
-// 	uint32_t buttons = button_state & has_changed;
-
-// 	if (k_msgq_num_used_get(&mitm_queue)) {
-// 		if (buttons & KEY_PAIRING_ACCEPT) {
-// 			pairing_button_pressed = true;
-// 			num_comp_reply(true);
-
-// 			return;
-// 		}
-
-// 		if (buttons & KEY_PAIRING_REJECT) {
-// 			pairing_button_pressed = true;
-// 			num_comp_reply(false);
-
-// 			return;
-// 		}
-// 	}
 
 // 	/* Do not take any action if the pairing button is released. */
 // 	if (pairing_button_pressed &&
@@ -930,6 +959,18 @@ void device_active_time_reset(void)								//start counting time to standby
 void device_active_time_stop(void)								//stop counting 
 {
 	device_active_counter=0;
+}
+
+//==================================================================================================================================================
+void display_default_time_reset(void)							//start counting time to back display to default state
+{
+	display_default_counter=1;
+}
+
+//==================================================================================================================================================
+void display_default_time_stop(void)							//stop counting 
+{
+	display_default_counter=0;
 }
 
 //==================================================================================================================================================
@@ -1035,7 +1076,7 @@ void main(void)
 		#endif	
 //--------------------------------------------------------------- timeout
 		#ifdef USE_LED 
-			if(device_active_counter>0) device_active_counter++;	//QUESTION: MUTEX?
+			if(device_active_counter>0) device_active_counter++;	
 
 			if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
 			{
@@ -1050,6 +1091,34 @@ void main(void)
 				led_pwm_charged_counter=0;
 			}
 		#endif
+
+//--------------------------------------------------------------- display timeot
+		if(display_default_counter>0) display_default_counter++;
+
+		if(display_default_counter>DISPLAY_TO_DEFAULT_TIME)			
+		{
+			device_state=BMK_ACTIVE;
+			device_theme = THEME_INFO;
+			lcd_pairing_state=NO_ACTION;
+			led_pairing_state=NO_ACTION;
+
+			refresh_screen_flag=true;
+			refresh_led_flag=true;
+
+			display_default_time_stop();
+			#ifdef DEBUG_LOG_DEVICE
+				LOG_INF("Timeout display\n");		
+			#endif
+		}	
+
+//--------------------------------------------------------------- refresh battery info
+		bas_counter++;
+		if(bas_counter>BAS_TIME)
+		{
+			bas_counter=0;
+			bas_notify();
+		}
+
 
 //--------------------------------------------------------------- 
 		k_sleep(K_MSEC(1000));

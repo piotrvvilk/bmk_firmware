@@ -43,7 +43,7 @@ void thread_i2c_devices(void)
 	#endif	
 
 	#ifdef USE_LIS2DH
-		accel_movement_detect(150);
+		accel_movement_detect(ACCEL_SENS);
 	#endif
 	
 	MAX17048GetCharge(&max17048_charge);

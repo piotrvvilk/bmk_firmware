@@ -23,6 +23,7 @@
 #include "config_app.h"
 #include "board.h"
 #include "led.h"
+#include "display.h"
 
 static uint32_t 	key_pressed;
 uint32_t			led_key_pressed;
@@ -84,38 +85,71 @@ void thread_keyboard(void)
 {
 	while(1)
 	{
-		key_pressed = check_keyboard();															//read keyboard										
+		key_pressed = check_keyboard();																//read keyboard										
 		
-		if(keyboard_blocked==0)																	//if keyboard not blocked
+		if(keyboard_blocked==0)																		//if keyboard not blocked
 		{
 			if(key_pressed!=0)
 			{
 				k_msleep(2);
-				key_pressed = check_keyboard();													//key detected
+				key_pressed = check_keyboard();														//key detected
 				if(key_pressed!=0)
 				{
-					if(device_theme==NO_THEME)													//restore last theme
+					if((lcd_pairing_state==PAIRING)||(lcd_pairing_state==PAIRING_ON_DISPLAY))
 					{
-						device_active_time_reset();												//reset standby counter	
-						device_state=BMK_ACTIVE;
-						device_theme = last_theme;
-					}	
-					
-					led_key_pressed=key_pressed;												//led blink 
-					keyboard_blocked=1;															//keyboard locked
-					if(key_pressed==1)															//next theme											
-					{
-						device_theme++;
-						if(device_theme>THEME_LAST) device_theme=THEME_FIRST;
-					}
+						led_key_pressed=key_pressed;												//led blink 
+						keyboard_blocked=1;															//keyboard locked
+						if(key_pressed==1)															//
+						{
+							num_comp_reply(true);
+							#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+								LOG_INF("PAIRING OK");
+							#endif
+						}
 
-					if(key_pressed==3)															//previous theme
+						if(key_pressed==3)															//
+						{
+							num_comp_reply(false);
+
+							device_state=BMK_ACTIVE;
+							device_theme = THEME_INFO;
+							lcd_pairing_state=NO_ACTION;
+							led_pairing_state=NO_ACTION;
+
+							refresh_screen_flag=true;
+							refresh_led_flag=true;
+
+							#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+								LOG_INF("PAIRING NO");
+							#endif
+
+						}
+					}
+					else
 					{
-						device_theme--;
-						if(device_theme<THEME_FIRST) device_theme=THEME_LAST;		
+						if(device_theme==NO_THEME)													//restore last theme
+						{
+							device_active_time_reset();												//reset standby counter	
+							device_state=BMK_ACTIVE;
+							device_theme = last_theme;
+						}	
+						
+						led_key_pressed=key_pressed;												//led blink 
+						keyboard_blocked=1;															//keyboard locked
+						if(key_pressed==1)															//next theme											
+						{
+							device_theme++;
+							if(device_theme>THEME_LAST) device_theme=THEME_FIRST;
+						}
+
+						if(key_pressed==3)															//previous theme
+						{
+							device_theme--;
+							if(device_theme<THEME_FIRST) device_theme=THEME_LAST;		
+						}
 					}
 				}
-				else																			//to short key pressed 
+				else																				//to short key pressed 
 				{
 					key_pressed=0;
 					led_key_pressed=key_pressed;
@@ -127,13 +161,13 @@ void thread_keyboard(void)
 			}
 		}
 
-		if(key_pressed==0)																		//if key not pressed	
+		if(key_pressed==0)																			//if key not pressed	
 		{
 		  	key_unlock_counter++;
 			if(key_unlock_counter>1)
 			{
 				key_unlock_counter=0;
-				keyboard_blocked=0;																//keyboard unlocked
+				keyboard_blocked=0;																	//keyboard unlocked
 			}
 			
 		}

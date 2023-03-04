@@ -19,14 +19,27 @@
 #define         BMK_STANDBY                     0
 #define         BMK_ACTIVE                      1
 
-//------------------------------------------------------------------- global variables
-extern uint32_t     device_active_counter;
-extern uint32_t     device_state;
+//-------------------------------------------------------------------- pairing state
+#define         NO_ACTION                       0
+#define         PAIRING                         1
+#define         PAIRING_ON_DISPLAY              2
+#define         PAIRED                          3
+#define         PAIRED_ON_DISPLAY               4
+#define         PAIRING_CANCELED                5
+#define         PAIRING_CANCELED_ON_DISPLAY     6
+#define         PAIRING_ERROR                   7
+#define         PAIRING_ERROR_ON_DISPLAY        8
 
-//------------------------------------------------------------------- public functions
+//-------------------------------------------------------------------- global variables
+extern volatile uint32_t        device_active_counter;
+extern volatile uint32_t        device_state;
+extern volatile uint32_t        lcd_pairing_state;        
+extern volatile uint32_t        led_pairing_state;
+//-------------------------------------------------------------------- public functions
 void device_active_time_reset(void);
 void device_active_time_stop(void);
+void num_comp_reply(bool accept);
 
-//-------------------------------------------------------------------
+//--------------------------------------------------------------------
 
 #endif 

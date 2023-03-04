@@ -41,6 +41,14 @@ int rc;
 
 bool refresh_screen_flag;
 
+//------------------------------------------------------- strings
+const char str_pairing[] ={"Pairing keyboard?"};
+const char str_ok[] ={"OK"};
+const char str_no[] ={"No"};
+const char str_pairing_ok[] ={"Keyboard paired"};
+const char str_pairing_err[] ={"Pairing error"};
+const char str_pairing_canceled[] ={"Pairing canceled"};
+
 LOG_MODULE_REGISTER(my_bmk_lcd,LOG_LEVEL_DBG);
 
 #ifdef USE_DISPLAY
@@ -124,6 +132,67 @@ static void display_battery(uint8_t battery_val)				//dispaly battery and usb pl
 }
 
 //==================================================================================================================================================
+static void display_pairing(void)
+{
+	lv_obj_clean(lv_scr_act());
+	lv_obj_t * label1 = lv_label_create(lv_scr_act());			
+	lv_obj_t * label2 = lv_label_create(lv_scr_act());
+	lv_obj_t * label3 = lv_label_create(lv_scr_act());
+	lv_label_set_recolor(label1, true); lv_label_set_recolor(label2, true); lv_label_set_recolor(label3, true);
+	
+	lv_label_set_text(label1, str_pairing);
+	lv_obj_set_style_text_color(label1, lv_color_hex(0xffffff), LV_PART_MAIN);
+	lv_obj_align(label1, LV_ALIGN_CENTER, 0, -30);
+	
+	lv_label_set_text(label2, str_ok);
+	lv_obj_set_style_text_color(label2, lv_color_hex(0x00ff00), LV_PART_MAIN);
+	lv_obj_align(label2, LV_ALIGN_CENTER, -70, 50);
+
+	lv_label_set_text(label3, str_no);
+	lv_obj_set_style_text_color(label3, lv_color_hex(0xff0000), LV_PART_MAIN);
+	lv_obj_align(label3, LV_ALIGN_CENTER, 70, 50);
+
+	lv_task_handler();
+	display_blanking_off(display_dev);
+	lcd_pairing_state=PAIRING_ON_DISPLAY;
+	lcd_backlight_on();
+}
+
+//==================================================================================================================================================
+static void display_paired(void)
+{
+	lv_obj_clean(lv_scr_act());
+	lv_obj_t * label1 = lv_label_create(lv_scr_act());			
+	lv_label_set_recolor(label1, true); 
+	
+	lv_label_set_text(label1, str_pairing_ok);
+	lv_obj_set_style_text_color(label1, lv_color_hex(0x00ff00), LV_PART_MAIN);
+	lv_obj_align(label1, LV_ALIGN_CENTER, 0, 0);
+
+	lv_task_handler();
+	display_blanking_off(display_dev);
+	lcd_pairing_state=PAIRED_ON_DISPLAY;
+	lcd_backlight_on();
+}
+
+//==================================================================================================================================================
+static void display_canceled(void)
+{
+	lv_obj_clean(lv_scr_act());
+	lv_obj_t * label1 = lv_label_create(lv_scr_act());			
+	lv_label_set_recolor(label1, true); 
+	
+	lv_label_set_text(label1, str_pairing_canceled);
+	lv_obj_set_style_text_color(label1, lv_color_hex(0xff0000), LV_PART_MAIN);
+	lv_obj_align(label1, LV_ALIGN_CENTER, 0, 0);
+
+	lv_task_handler();
+	display_blanking_off(display_dev);
+	lcd_pairing_state=PAIRING_CANCELED_ON_DISPLAY;
+	lcd_backlight_on();
+}
+
+//==================================================================================================================================================
 void display_info_screen(void)
 {
 	display_theme=device_theme;
@@ -166,27 +235,48 @@ void display_info_screen(void)
 void thread_lcd(void)
 {
 //----------------------------------------------------------------------------- display init
-		display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
-		if (!device_is_ready(display_dev)) {
-			LOG_ERR("Device not ready, aborting test");
-			return;
-		}
-		lcd_backlight_on();
+	if (!device_is_ready(display_dev)) 
+	{
+		LOG_ERR("Device not ready, aborting test");
+		return;
+	}
+	lcd_backlight_on();
 
 //-------------------------------------------------------------- 			
-		lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-		LV_IMG_DECLARE(logo);
-		lv_obj_t * img1 = lv_img_create(lv_scr_act());
-		lv_img_set_src(img1, &logo);
-		lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-		lv_obj_set_size(img1, 240, 160);
-		lv_task_handler();
-		display_blanking_off(display_dev);
+	LV_IMG_DECLARE(logo);
+	lv_obj_t * img1 = lv_img_create(lv_scr_act());
+	lv_img_set_src(img1, &logo);
+	lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+	lv_obj_set_size(img1, 240, 160);
+	lv_task_handler();
+	display_blanking_off(display_dev);
     
-		while(1)
+	while(1)
+	{
+//----------------------------------------------------------------------------- pairing process						
+		if(lcd_pairing_state!=NO_ACTION)
 		{
+	 		if(lcd_pairing_state==PAIRING)
+			{
+				display_pairing();
+			}
+
+			if(lcd_pairing_state==PAIRED)
+			{
+				display_paired();
+			}
+			
+			if(lcd_pairing_state==PAIRING_CANCELED)
+			{
+				display_canceled();
+			}
+		}
+		else
+		{	
 //----------------------------------------------------------------------------- gta theme			
 			if((device_theme!=display_theme)||(refresh_screen_flag==true))
 			{
@@ -238,10 +328,10 @@ void thread_lcd(void)
 //----------------------------------------------------------------------------- info theme			
 				if(device_theme==THEME_INFO)
 				{
-					
 					display_info_screen();									
 				}	
 
+//----------------------------------------------------------------------------- no theme			
 				if(device_theme==NO_THEME)
 				{
 					lcd_backlight_off();
@@ -249,10 +339,9 @@ void thread_lcd(void)
 					
 				}
 			}
-
-			k_msleep(100);
 		}
-
+		k_msleep(100);
+	}													//end while(1)
 }
 
 

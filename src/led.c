@@ -124,6 +124,7 @@ int set_button_color(uint8_t position, uint8_t color)
 	rc = led_strip_update_rgb(strip, my_pix.pix, STRIP_NUM_PIXELS);
     return rc;
 }
+
 //=================================================================================================================
 int set_button_pattern(const uint8_t *pattern)
 {
@@ -198,116 +199,141 @@ void thread_led(void)
 
  	while(1)
  	{
-		if((device_theme!=led_theme)||(refresh_led_flag==true))
+		if(led_pairing_state!=NO_ACTION)
 		{
-			refresh_led_flag=false;
-			#ifdef DEBUG_LOG_LED
-				LOG_ERR("REFRESH LED STATE\n");
-			#endif
-			
-			if(device_theme==THEME_GTA)
-			{
-				vled_on()																//led power on
-				k_msleep(20);															//wait to led inside driver
-				led_theme=device_theme;													//don't repeat this condition all the time 
-				current_pattern = gta_pattern;											//set current theme		
-				set_button_pattern(current_pattern);									//turn on led strip
-
-				if(charger_data.charger_status==CHARGER_DISABLE)						//set bottom led color only if charger disable
-				{
-					err = led_set_brightness(led_pwm, LED_RED_PWM, 100);				//set appropriate PWM LED PCB bottom
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }		//QUESTION: WHAT SHOULD I DO WITH EER?
-
-					err = led_off(led_pwm, LED_GREEN_PWM); 
-					if (err < 0) { LOG_ERR("err=%d", err); }
-
-					err = led_off(led_pwm, LED_BLUE_PWM); 
-					if (err < 0) { LOG_ERR("err=%d", err); }
-				}
-			}
-
-			if(device_theme==THEME_ALTIUM)												//another theme 
+//----------------------------------------------------------------------------- pairing process						
+			if(led_pairing_state==PAIRING)
 			{
 				vled_on()
 				k_msleep(20);
 				led_theme=device_theme;
-				current_pattern = altium_pattern;
-				set_button_pattern(current_pattern);	
-
-				if(charger_data.charger_status==CHARGER_DISABLE)
-				{
-					err = led_set_brightness(led_pwm, LED_RED_PWM, 100);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
-
-					err = led_set_brightness(led_pwm, LED_GREEN_PWM, 50);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 50); }
-
-					err = led_off(led_pwm, LED_BLUE_PWM); 
-					if (err < 0) { LOG_ERR("err=%d", err); }
-				}
+				current_pattern = pairing_pattern;	
+				set_button_pattern(current_pattern);
+						
+				led_off(led_pwm, LED_RED_PWM); 
+				led_off(led_pwm, LED_GREEN_PWM); 
+				led_off(led_pwm, LED_BLUE_PWM); 
+				led_pairing_state=PAIRING_ON_DISPLAY;
 			}
 
-			if(device_theme==THEME_VSC)
+			if(led_pairing_state==PAIRED)
 			{
 				vled_on()
 				k_msleep(20);
 				led_theme=device_theme;
-				current_pattern = vsc_pattern;	
+				current_pattern = turn_off_pattern;	
 				set_button_pattern(current_pattern);
-
-				
-				if(charger_data.charger_status==CHARGER_DISABLE)
-				{
-					err = led_off(led_pwm, LED_RED_PWM); 
-					if (err < 0) { LOG_ERR("err=%d", err); }
-
-					err = led_off(led_pwm, LED_GREEN_PWM); 
-					if (err < 0) { LOG_ERR("err=%d", err); }
-
-					err = led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 100); }
-				}
+						
+				led_set_brightness(led_pwm, LED_GREEN_PWM, 100);				
+				led_off(led_pwm, LED_RED_PWM);				
+				led_off(led_pwm, LED_BLUE_PWM); 
+				led_pairing_state=PAIRED_ON_DISPLAY;
 			}
 
-			if(device_theme==THEME_INFO)
+			if(led_pairing_state==PAIRING_CANCELED)
 			{
 				vled_on()
 				k_msleep(20);
 				led_theme=device_theme;
-				current_pattern = info_pattern;	
+				current_pattern = turn_off_pattern;	
 				set_button_pattern(current_pattern);
-
-				if(charger_data.charger_status==CHARGER_DISABLE)
-				{
-					err = led_set_brightness(led_pwm, LED_RED_PWM, 80);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 70); }
-
-					err = led_set_brightness(led_pwm, LED_GREEN_PWM, 70);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 70); }
-
-					err = led_set_brightness(led_pwm, LED_BLUE_PWM, 80);
-					if (err < 0) { LOG_ERR("err=%d brightness=%d\n", err, 70); }
-				}
+						
+				led_set_brightness(led_pwm, LED_RED_PWM, 100);				
+				led_off(led_pwm, LED_GREEN_PWM);				
+				led_off(led_pwm, LED_BLUE_PWM); 
+				led_pairing_state=PAIRING_CANCELED_ON_DISPLAY;
 			}
 
-			if(device_theme==NO_THEME)
+		}
+		else
+		{
+			if((device_theme!=led_theme)||(refresh_led_flag==true))
 			{
-				led_theme=device_theme;
-				current_pattern = turn_off_pattern;
-				set_button_pattern(current_pattern);
-			
-				err = led_off(led_pwm, LED_RED_PWM); 
-				if (err < 0) { LOG_ERR("err=%d", err); }
-
-				err = led_off(led_pwm, LED_GREEN_PWM); 
-				if (err < 0) { LOG_ERR("err=%d", err); }
+				refresh_led_flag=false;
+				#ifdef DEBUG_LOG_LED
+					LOG_ERR("REFRESH LED STATE\n");
+				#endif
 				
-				err = led_off(led_pwm, LED_BLUE_PWM); 
-				if (err < 0) { LOG_ERR("err=%d", err); }
-				
-				if(charger_data.usb_status==USB_DISCONNECTED)							//turn off boost only when usb is unpluged
+				if(device_theme==THEME_GTA)
 				{
-					vled_off()
+					vled_on()																//led power on
+					k_msleep(20);															//wait to led inside driver
+					led_theme=device_theme;													//don't repeat this condition all the time 
+					current_pattern = gta_pattern;											//set current theme		
+					set_button_pattern(current_pattern);									//turn on led strip
+
+					if(charger_data.charger_status==CHARGER_DISABLE)						//set bottom led color only if charger disable
+					{
+						led_set_brightness(led_pwm, LED_RED_PWM, 100);						//set appropriate PWM LED PCB bottom
+						led_off(led_pwm, LED_GREEN_PWM); 
+						led_off(led_pwm, LED_BLUE_PWM); 
+					}
+				}
+
+				if(device_theme==THEME_ALTIUM)												//another theme 
+				{
+					vled_on()
+					k_msleep(20);
+					led_theme=device_theme;
+					current_pattern = altium_pattern;
+					set_button_pattern(current_pattern);	
+
+					if(charger_data.charger_status==CHARGER_DISABLE)
+					{
+						led_set_brightness(led_pwm, LED_RED_PWM, 100);
+						led_set_brightness(led_pwm, LED_GREEN_PWM, 50);
+						led_off(led_pwm, LED_BLUE_PWM); 
+					}
+				}
+
+				if(device_theme==THEME_VSC)
+				{
+					vled_on()
+					k_msleep(20);
+					led_theme=device_theme;
+					current_pattern = vsc_pattern;	
+					set_button_pattern(current_pattern);
+
+					
+					if(charger_data.charger_status==CHARGER_DISABLE)
+					{
+						led_off(led_pwm, LED_RED_PWM); 
+						led_off(led_pwm, LED_GREEN_PWM); 
+						led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
+						
+					}
+				}
+
+				if(device_theme==THEME_INFO)
+				{
+					vled_on()
+					k_msleep(20);
+					led_theme=device_theme;
+					current_pattern = info_pattern;	
+					set_button_pattern(current_pattern);
+
+					if(charger_data.charger_status==CHARGER_DISABLE)
+					{
+						led_set_brightness(led_pwm, LED_RED_PWM, 80);
+						led_set_brightness(led_pwm, LED_GREEN_PWM, 70);
+						led_set_brightness(led_pwm, LED_BLUE_PWM, 80);
+					}
+				}
+
+				if(device_theme==NO_THEME)
+				{
+					led_theme=device_theme;
+					current_pattern = turn_off_pattern;
+					set_button_pattern(current_pattern);
+				
+					led_off(led_pwm, LED_RED_PWM); 
+					led_off(led_pwm, LED_GREEN_PWM); 
+					led_off(led_pwm, LED_BLUE_PWM); 
+
+					if(charger_data.usb_status==USB_DISCONNECTED)							//turn off boost only when usb is unpluged
+					{
+						vled_off()
+					}
 				}
 			}
 		}
