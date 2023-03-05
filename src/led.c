@@ -154,7 +154,7 @@ void thread_led(void)
 	vled_on();
 	k_msleep(100);
 
-//---------------------------------------------------------------------------------- led pwm test
+//-------------------------------------------------------------------------------------- led pwm test
 	#ifdef MAKE_LED_PWM_TEST
 		for(int i=0;i<5;i++)
 		{
@@ -173,7 +173,7 @@ void thread_led(void)
 		}
 	#endif
 
-//---------------------------------------------------------------------------------- led strip test
+//-------------------------------------------------------------------------------------- led strip test
 	#ifdef MAKE_LED_STRIP_TEST														 
 		for(int i=0;i<5;i++)
 		{
@@ -192,17 +192,17 @@ void thread_led(void)
 		set_button_pattern(current_pattern);
 
 	#endif	
-//----------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
 	device_theme=THEME_INFO;
 	set_button_pattern(info_pattern);
 
  	while(1)
  	{
-		if(led_pairing_state!=NO_ACTION)
-		{
-//----------------------------------------------------------------------------- pairing process						
-			if(led_pairing_state==PAIRING)
+		// if(led_pairing_state!=NO_ACTION)
+		// {
+//-------------------------------------------------------------------------------------- pairing process						
+		if(led_pairing_state==PAIRING)
 			{
 				vled_on()
 				k_msleep(20);
@@ -216,7 +216,7 @@ void thread_led(void)
 				led_pairing_state=PAIRING_ON_DISPLAY;
 			}
 
-			if(led_pairing_state==PAIRED)
+		else if(led_pairing_state==PAIRED)
 			{
 				vled_on()
 				k_msleep(20);
@@ -230,7 +230,7 @@ void thread_led(void)
 				led_pairing_state=PAIRED_ON_DISPLAY;
 			}
 
-			if(led_pairing_state==PAIRING_CANCELED)
+		else if(led_pairing_state==PAIRING_CANCELED)
 			{
 				vled_on()
 				k_msleep(20);
@@ -244,7 +244,7 @@ void thread_led(void)
 				led_pairing_state=PAIRING_CANCELED_ON_DISPLAY;
 			}
 
-		}
+		//}
 		else
 		{
 			if((device_theme!=led_theme)||(refresh_led_flag==true))
@@ -270,7 +270,7 @@ void thread_led(void)
 					}
 				}
 
-				if(device_theme==THEME_ALTIUM)												//another theme 
+				if(device_theme==THEME_ALTIUM)											//another theme 
 				{
 					vled_on()
 					k_msleep(20);

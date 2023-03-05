@@ -32,6 +32,7 @@
 //======================================================= APPLICATION DEBUG LOGGER
 #define         DEBUG_LOG_APP                   1
 #ifdef          DEBUG_LOG_APP                     
+    #define     DEBUG_LOG_HID                   1
     #define     DEBUG_LOG_DEVICE                1
     #define     DEBUG_LOG_MATRIX_KEYBOARD       1
     //#define     DEBUG_LOG_LED                   1

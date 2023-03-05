@@ -29,6 +29,9 @@
 #define         PAIRING_CANCELED_ON_DISPLAY     6
 #define         PAIRING_ERROR                   7
 #define         PAIRING_ERROR_ON_DISPLAY        8
+#define         CONNECTED                       9
+#define         DISCONNECTED                    10
+
 
 //-------------------------------------------------------------------- global variables
 extern volatile uint32_t        device_active_counter;
@@ -36,6 +39,8 @@ extern volatile uint32_t        device_state;
 extern volatile uint32_t        lcd_pairing_state;        
 extern volatile uint32_t        led_pairing_state;
 //-------------------------------------------------------------------- public functions
+int hid_buttons_press(const uint8_t *keys, size_t cnt);
+int hid_buttons_release(const uint8_t *keys, size_t cnt);
 void device_active_time_reset(void);
 void device_active_time_stop(void);
 void num_comp_reply(bool accept);

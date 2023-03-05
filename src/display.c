@@ -234,7 +234,7 @@ void display_info_screen(void)
 //==================================================================================================================================================
 void thread_lcd(void)
 {
-//----------------------------------------------------------------------------- display init
+//-------------------------------------------------------------------------------------- display init
 	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
 	if (!device_is_ready(display_dev)) 
@@ -257,31 +257,31 @@ void thread_lcd(void)
     
 	while(1)
 	{
-//----------------------------------------------------------------------------- pairing process						
-		if(lcd_pairing_state!=NO_ACTION)
-		{
+//-------------------------------------------------------------------------------------- pairing process
+		// if(lcd_pairing_state!=NO_ACTION)
+		// {
 	 		if(lcd_pairing_state==PAIRING)
 			{
 				display_pairing();
 			}
 
-			if(lcd_pairing_state==PAIRED)
+			else if(lcd_pairing_state==PAIRED)
 			{
 				display_paired();
 			}
 			
-			if(lcd_pairing_state==PAIRING_CANCELED)
+			else if(lcd_pairing_state==PAIRING_CANCELED)
 			{
 				display_canceled();
 			}
-		}
+		//}
 		else
 		{	
-//----------------------------------------------------------------------------- gta theme			
+//-------------------------------------------------------------------------------------- themes			
 			if((device_theme!=display_theme)||(refresh_screen_flag==true))
 			{
 				refresh_screen_flag=false;
-
+//-------------------------------------------------------------------------------------- gta theme
 				if(device_theme==THEME_GTA)
 				{
 					display_theme=device_theme;									
@@ -295,7 +295,7 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
-//----------------------------------------------------------------------------- altium theme			
+//-------------------------------------------------------------------------------------- altium theme			
 				if(device_theme==THEME_ALTIUM)
 				{
 					display_theme=device_theme;
@@ -310,7 +310,7 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
-//----------------------------------------------------------------------------- vsc theme			
+//-------------------------------------------------------------------------------------- vsc theme			
 				if(device_theme==THEME_VSC)
 				{
 					display_theme=device_theme;
@@ -325,13 +325,13 @@ void thread_lcd(void)
 					lcd_backlight_on();
 				}
 
-//----------------------------------------------------------------------------- info theme			
+//-------------------------------------------------------------------------------------- info theme			
 				if(device_theme==THEME_INFO)
 				{
 					display_info_screen();									
 				}	
 
-//----------------------------------------------------------------------------- no theme			
+//-------------------------------------------------------------------------------------- no theme			
 				if(device_theme==NO_THEME)
 				{
 					lcd_backlight_off();
@@ -341,7 +341,7 @@ void thread_lcd(void)
 			}
 		}
 		k_msleep(100);
-	}													//end while(1)
+	}																					//end while(1)
 }
 
 

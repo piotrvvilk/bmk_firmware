@@ -197,7 +197,9 @@ static void advertising_start(void)
 	}
 
 	is_adv = true;
-	LOG_INF("Advertising successfully started\n");
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Advertising successfully started\n");
+	#endif
 }
 
 //==================================================================================================================================================
@@ -219,8 +221,10 @@ static void pairing_process(struct k_work *work)
 	lcd_pairing_state = PAIRING;
 	led_pairing_state = PAIRING;
 
-	LOG_INF("Passkey for %s: %06u\n", addr, pairing_data.passkey);
-	LOG_INF("Press Button 1 to confirm, Button 2 to reject.\n");
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Passkey for %s: %06u\n", addr, pairing_data.passkey);
+		LOG_INF("Press Button 1 to confirm, Button 2 to reject.\n");
+	#endif
 }
 
 //==================================================================================================================================================
@@ -232,23 +236,23 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	if (err) 
 	{
-		lcd_pairing_state = PAIRING_ERROR;
-		led_pairing_state = PAIRING_ERROR;
+		lcd_pairing_state = DISCONNECTED;
+		led_pairing_state = DISCONNECTED;
 		LOG_INF("Failed to connect to %s (%u)\n", addr, err);
 		return;
 	}
 
 	LOG_INF("Connected %s\n", addr);
 	
-	lcd_pairing_state = PAIRED;
-	led_pairing_state = PAIRED;
+	lcd_pairing_state = CONNECTED;
+	led_pairing_state = CONNECTED;
 
 	err = bt_hids_connected(&hids_obj, conn);
 
 	if (err) 
 	{
-		lcd_pairing_state = PAIRING_ERROR;
-		led_pairing_state = PAIRING_ERROR;
+		lcd_pairing_state = DISCONNECTED;
+		led_pairing_state = DISCONNECTED;
 		LOG_INF("Failed to notify HID service about connection\n");
 		return;
 	}
@@ -283,14 +287,18 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-	LOG_INF("Disconnected from %s (reason %u)\n", addr, reason);
+	
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Disconnected from %s (reason %u)\n", addr, reason);
+	#endif
 
 	err = bt_hids_disconnected(&hids_obj, conn);
 
 	if (err) 
 	{
-		LOG_INF("Failed to notify HID service about disconnection\n");
+		#ifdef DEBUG_LOG_HID
+			LOG_INF("Failed to notify HID service about disconnection\n");
+		#endif
 	}
 
 	for (size_t i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) 
@@ -325,11 +333,15 @@ static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_
 
 	if (!err) 
 	{
-		LOG_INF("Security changed: %s level %u\n", addr, level);
+		#ifdef DEBUG_LOG_HID
+			LOG_INF("Security changed: %s level %u\n", addr, level);
+		#endif
 	} 
 	else 
 	{
-		LOG_INF("Security failed: %s level %u err %d\n", addr, level,err);
+		#ifdef DEBUG_LOG_HID
+			LOG_INF("Security failed: %s level %u err %d\n", addr, level,err);
+		#endif
 	}
 }
 
@@ -354,12 +366,16 @@ static void hids_outp_rep_handler(struct bt_hids_rep *rep, struct bt_conn *conn,
 
 	if (!write) 
 	{
-		LOG_INF("Output report read\n");
+		#ifdef DEBUG_LOG_HID
+			LOG_INF("Output report read\n");
+		#endif
 		return;
 	};
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-	LOG_INF("Output report has been received %s\n", addr);
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Output report has been received %s\n", addr);
+	#endif
 	caps_lock_handler(rep);
 }
 
@@ -370,12 +386,16 @@ static void hids_boot_kb_outp_rep_handler(struct bt_hids_rep *rep, struct bt_con
 
 	if (!write)
 	{
-		LOG_INF("Output report read\n");
+		#ifdef DEBUG_LOG_HID
+			LOG_INF("Output report read\n");
+		#endif
 		return;
 	};
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-	LOG_INF("Boot Keyboard Output report has been received %s\n", addr);
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Boot Keyboard Output report has been received %s\n", addr);
+	#endif
 	caps_lock_handler(rep);
 }
 
@@ -554,8 +574,10 @@ static void auth_cancel(struct bt_conn *conn)
 	led_pairing_state = NO_ACTION; 
 	device_theme=THEME_INFO;
 	device_state=BMK_ACTIVE;
-
-	LOG_INF("Pairing cancelled: %s\n", addr);
+	
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Pairing cancelled: %s\n", addr);
+	#endif
 }
 
 //==================================================================================================================================================
@@ -568,8 +590,10 @@ static void pairing_complete(struct bt_conn *conn, bool bonded)
 	lcd_pairing_state = PAIRED;
 	led_pairing_state = PAIRED; 
 	display_default_time_reset();
-
-	LOG_INF("Pairing completed: %s, bonded: %d\n", addr, bonded);
+	
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Pairing completed: %s, bonded: %d\n", addr, bonded);
+	#endif
 }
 
 //==================================================================================================================================================
@@ -595,8 +619,9 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 	led_pairing_state = NO_ACTION; 
 	device_theme=THEME_INFO;
 	device_state=BMK_ACTIVE;
-
-	LOG_INF("Pairing failed conn: %s, reason %d\n", addr, reason);
+	#ifdef DEBUG_LOG_HID
+		LOG_INF("Pairing failed conn: %s, reason %d\n", addr, reason);
+	#endif
 }
 
 //==================================================================================================================================================
@@ -747,58 +772,6 @@ static int hid_kbd_state_key_clear(uint8_t key)
 }
 
 //==================================================================================================================================================
-/** @brief Press a button and send report
- *
- *  @note Functions to manipulate hid state are not reentrant
- *  @param keys
- *  @param cnt
- *
- *  @return 0 on success or negative error code.
- */
-static int hid_buttons_press(const uint8_t *keys, size_t cnt)
-{
-	while (cnt--)
-	{
-		int err;
-
-		err = hid_kbd_state_key_set(*keys++);
-		if (err) 
-		{
-			LOG_INF("Cannot set selected key.\n");
-			return err;
-		}
-	}
-
-	return key_report_send();
-}
-
-//==================================================================================================================================================
-/** @brief Release the button and send report
- *
- *  @note Functions to manipulate hid state are not reentrant
- *  @param keys
- *  @param cnt
- *
- *  @return 0 on success or negative error code.
- */
-static int hid_buttons_release(const uint8_t *keys, size_t cnt)
-{
-	while (cnt--) 
-	{
-		int err;
-
-		err = hid_kbd_state_key_clear(*keys++);
-		if (err) 
-		{
-			LOG_INF("Cannot clear selected key.\n");
-			return err;
-		}
-	}
-
-	return key_report_send();
-}
-
-//==================================================================================================================================================
 // static void button_text_changed(bool down)
 // {
 // 	static const uint8_t *chr = hello_world_str;
@@ -916,7 +889,56 @@ static void bas_notify(void)
 }
 
 //==================================================================================================================================================
+/** @brief Press a button and send report
+ *
+ *  @note Functions to manipulate hid state are not reentrant
+ *  @param keys
+ *  @param cnt
+ *
+ *  @return 0 on success or negative error code.
+ */
+int hid_buttons_press(const uint8_t *keys, size_t cnt)
+{
+	while (cnt--)
+	{
+		int err;
 
+		err = hid_kbd_state_key_set(*keys++);
+		if (err) 
+		{
+			LOG_INF("Cannot set selected key.\n");
+			return err;
+		}
+	}
+
+	return key_report_send();
+}
+
+//==================================================================================================================================================
+/** @brief Release the button and send report
+ *
+ *  @note Functions to manipulate hid state are not reentrant
+ *  @param keys
+ *  @param cnt
+ *
+ *  @return 0 on success or negative error code.
+ */
+int hid_buttons_release(const uint8_t *keys, size_t cnt)
+{
+	while (cnt--) 
+	{
+		int err;
+
+		err = hid_kbd_state_key_clear(*keys++);
+		if (err) 
+		{
+			LOG_INF("Cannot clear selected key.\n");
+			return err;
+		}
+	}
+
+	return key_report_send();
+}
 
 // 	/* Do not take any action if the pairing button is released. */
 // 	if (pairing_button_pressed &&
@@ -1071,7 +1093,6 @@ void main(void)
 				{
 					device_theme = last_theme;
 				}
-				
 			}	
 		#endif	
 //--------------------------------------------------------------- timeout
@@ -1092,7 +1113,7 @@ void main(void)
 			}
 		#endif
 
-//--------------------------------------------------------------- display timeot
+//--------------------------------------------------------------- display timeout (pairing mode)
 		if(display_default_counter>0) display_default_counter++;
 
 		if(display_default_counter>DISPLAY_TO_DEFAULT_TIME)			
