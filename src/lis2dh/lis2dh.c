@@ -15,16 +15,12 @@
 #include "lis2dh.h"
 
 //---------------------------------------------------------------------------
-// Definitions 
+// Global objects  
 //---------------------------------------------------------------------------
 int16_t			x_axis, y_axis, z_axis;
 int8_t			x_l_axis, y_l_axis, z_l_axis;
 uint8_t 		accel_temp;
 bool 			lis_int1_flag;
-
-//int16_t	x_axis_buf, y_axis_buf, z_axis_buf;
-//float angle_x,angle_y,angle_z;
-//uint32_t res;
 
 const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
@@ -32,7 +28,7 @@ const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 	LOG_MODULE_REGISTER(my_bmk_lis,LOG_LEVEL_DBG);
 #endif	
 
-//==================================================================================================================================================
+//============================================================================================================================================
 static int lis2dh_write_reg(uint8_t addr, uint8_t data)
 {
 	uint8_t wr_addr[2];
@@ -53,7 +49,7 @@ static int lis2dh_write_reg(uint8_t addr, uint8_t data)
 	return i2c_transfer(i2c_dev, &msgs[0], 2, LIS2DH_SLAVE_ADDRESS);
 }
 
-//==================================================================================================================================================
+//============================================================================================================================================
 static int lis2dh_read_reg(uint16_t addr, uint8_t *data)
 {
 	uint8_t wr_addr[2];
@@ -74,7 +70,7 @@ static int lis2dh_read_reg(uint16_t addr, uint8_t *data)
 	return i2c_transfer(i2c_dev, &msgs[0], 2, LIS2DH_SLAVE_ADDRESS);
 }
 
-//==================================================================================================================================================
+//============================================================================================================================================
 uint32_t i2c_init(void)
 {
 	if (!device_is_ready(i2c_dev)) 

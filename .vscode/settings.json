@@ -28,7 +28,8 @@
         "display.h": "c",
         "lv_example_style.h": "c",
         "lv_example_get_started.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "stddef.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "nrf-connect.debugging.bindings": {

@@ -26,12 +26,13 @@
 #include "display.h"
 
 static uint32_t 	key_pressed;
-uint32_t			led_key_pressed;
-
-uint8_t 			device_theme=THEME_INFO;									//color, display, pwm_led, led_strip
-uint8_t				last_theme;
 static uint32_t		keyboard_blocked;
 static uint32_t		key_unlock_counter;
+
+
+uint32_t			led_key_pressed;
+uint8_t 			device_theme=THEME_INFO;									//color, display, pwm_led, led_strip
+uint8_t				last_theme;
 
 #ifdef DEBUG_LOG_MATRIX_KEYBOARD
 	LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
@@ -229,19 +230,19 @@ void thread_keyboard(void)
 {
 	while(1)
 	{
-		key_pressed = check_keyboard();																//read keyboard										
+		key_pressed = check_keyboard();													//read keyboard										
 		
-		if(keyboard_blocked==0)																		//if keyboard not blocked
+		if(keyboard_blocked==0)															//if keyboard not blocked
 		{
 			if(key_pressed!=0)
 			{
 				k_msleep(2);
-				key_pressed = check_keyboard();														//key detected
+				key_pressed = check_keyboard();											//key detected
 				if(key_pressed!=0)
 				{
 					keyboard_handler();
 				}
-				else																				//to short key pressed 
+				else																	//to short key pressed 
 				{
 					key_pressed=0;
 					led_key_pressed=key_pressed;
@@ -253,13 +254,13 @@ void thread_keyboard(void)
 			}
 		}
 
-		if(key_pressed==0)																			//if key not pressed	
+		if(key_pressed==0)																//if key not pressed	
 		{
 		  	key_unlock_counter++;
 			if(key_unlock_counter>1)
 			{
 				key_unlock_counter=0;
-				keyboard_blocked=0;																	//keyboard unlocked
+				keyboard_blocked=0;														//keyboard unlocked
 			}
 			
 		}
