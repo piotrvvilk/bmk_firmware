@@ -1,7 +1,7 @@
 
 ### About
 
- BMK full firmware :computer:
+ BMK firmware :computer:
 
 ### Changelog :calendar:
 
