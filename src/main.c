@@ -43,6 +43,8 @@
 #include "lis2dh/lis2dh.h"
 #include "charger.h"
 
+#include "keyboard_sequences.h"
+
 /*---------------------------------------------------------------------------*/
 /* Definitions */
 /*---------------------------------------------------------------------------*/
@@ -143,16 +145,16 @@ static struct conn_mode {
 	bool in_boot_mode;
 } conn_mode[CONFIG_BT_HIDS_MAX_CLIENT_COUNT];
 
- static const uint8_t hello_world_str[] = {
- 	0x0b,	/* Key h */
- 	0x08,	/* Key e */
- 	0x0f,	/* Key l */
- 	0x0f,	/* Key l */
- 	0x12,	/* Key o */
- 	0x28,	/* Key Return */
- };
+//  static const uint8_t hello_world_str[] = {
+//  	0x0b,	/* Key h */
+//  	0x08,	/* Key e */
+//  	0x0f,	/* Key l */
+//  	0x0f,	/* Key l */
+//  	0x12,	/* Key o */
+//  	0x28,	/* Key Return */
+//  };
 
-static const uint8_t shift_key[] = { 225 };
+//static const uint8_t shift_key[] = { 225 };
 
 /* Current report status
  */
@@ -166,6 +168,7 @@ struct pairing_data_mitm {
 	struct bt_conn *conn;
 	unsigned int passkey;
 };
+
 
 K_MSGQ_DEFINE(mitm_queue, sizeof(struct pairing_data_mitm), CONFIG_BT_HIDS_MAX_CLIENT_COUNT, 4);
 
@@ -357,16 +360,9 @@ static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_
 }
 
 //===============================================================================================================
-BT_CONN_CB_DEFINE(conn_callbacks) = {
-	.connected = connected,
-	.disconnected = disconnected,
-	.security_changed = security_changed,
-};
-
-//===============================================================================================================
 static void caps_lock_handler(const struct bt_hids_rep *rep)
 {
-	uint8_t report_val = ((*rep->data) & OUTPUT_REPORT_BIT_MASK_CAPS_LOCK) ? 1 : 0;
+	//uint8_t report_val = ((*rep->data) & OUTPUT_REPORT_BIT_MASK_CAPS_LOCK) ? 1 : 0;
 	//dk_set_led(LED_CAPS_LOCK, report_val);
 }
 
@@ -636,6 +632,13 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 }
 
 //===============================================================================================================
+BT_CONN_CB_DEFINE(conn_callbacks) = {
+	.connected = connected,
+	.disconnected = disconnected,
+	.security_changed = security_changed,
+};
+
+//===============================================================================================================
 static struct bt_conn_auth_cb conn_auth_callbacks = {
 	.passkey_display = auth_passkey_display,
 	.passkey_confirm = auth_passkey_confirm,
@@ -781,31 +784,6 @@ static int hid_kbd_state_key_clear(uint8_t key)
 }
 
 //===============================================================================================================
-// static void button_text_changed(bool down)
-// {
-// 	static const uint8_t *chr = hello_world_str;
-
-// 	if (down) {
-// 		hid_buttons_press(chr, 1);
-// 	} else {
-// 		hid_buttons_release(chr, 1);
-// 		if (++chr == (hello_world_str + sizeof(hello_world_str))) {
-// 			chr = hello_world_str;
-// 		}
-// 	}
-// }
-
-// //===============================================================================================================
-// static void button_shift_changed(bool down)
-// {
-// 	if (down) {
-// 		hid_buttons_press(shift_key, 1);
-// 	} else {
-// 		hid_buttons_release(shift_key, 1);
-// 	}
-// }
-
-//===============================================================================================================
 void num_comp_reply(bool accept)
 {
 	struct pairing_data_mitm pairing_data;
@@ -860,36 +838,7 @@ void num_comp_reply(bool accept)
 // 		}
 // 	}
 
-// 	/* Do not take any action if the pairing button is released. */
-// 	if (pairing_button_pressed &&
-// 	    (has_changed & (KEY_PAIRING_ACCEPT | KEY_PAIRING_REJECT))) {
-// 		pairing_button_pressed = false;
 
-// 		return;
-// 	}
-
-// 	if (has_changed & KEY_TEXT_MASK) {
-// 		button_text_changed((button_state & KEY_TEXT_MASK) != 0);
-// 	}
-// 	if (has_changed & KEY_SHIFT_MASK) {
-// 		button_shift_changed((button_state & KEY_SHIFT_MASK) != 0);
-// 	}
-// #if CONFIG_NFC_OOB_PAIRING
-// 	if (has_changed & KEY_ADV_MASK) {
-// 		size_t i;
-
-// 		for (i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-// 			if (!conn_mode[i].conn) {
-// 				advertising_start();
-// 				return;
-// 			}
-// 		}
-
-// 		printk("Cannot start advertising, all connections slots are"
-// 		       " taken\n");
-// 	}
-// #endif
-// }
 
 //===============================================================================================================
 static void bas_notify(void)
@@ -911,7 +860,7 @@ int hid_buttons_press(const uint8_t *keys, size_t cnt)
 	while (cnt--)
 	{
 		int err;
-
+		
 		err = hid_kbd_state_key_set(*keys++);
 		if (err) 
 		{
@@ -948,37 +897,6 @@ int hid_buttons_release(const uint8_t *keys, size_t cnt)
 
 	return key_report_send();
 }
-
-// 	/* Do not take any action if the pairing button is released. */
-// 	if (pairing_button_pressed &&
-// 	    (has_changed & (KEY_PAIRING_ACCEPT | KEY_PAIRING_REJECT))) {
-// 		pairing_button_pressed = false;
-
-// 		return;
-// 	}
-
-// 	if (has_changed & KEY_TEXT_MASK) {
-// 		button_text_changed((button_state & KEY_TEXT_MASK) != 0);
-// 	}
-// 	if (has_changed & KEY_SHIFT_MASK) {
-// 		button_shift_changed((button_state & KEY_SHIFT_MASK) != 0);
-// 	}
-// #if CONFIG_NFC_OOB_PAIRING
-// 	if (has_changed & KEY_ADV_MASK) {
-// 		size_t i;
-
-// 		for (i = 0; i < CONFIG_BT_HIDS_MAX_CLIENT_COUNT; i++) {
-// 			if (!conn_mode[i].conn) {
-// 				advertising_start();
-// 				return;
-// 			}
-// 		}
-
-// 		printk("Cannot start advertising, all connections slots are"
-// 		       " taken\n");
-// 	}
-// #endif
-// }
 
 //===============================================================================================================
 void device_active_time_reset(void)								//start counting time to standby 
@@ -1089,7 +1007,6 @@ void main(void)
 //===============================================================================================================
 	while (1) 
 	{
-
 //-------------------------------------------------------------- lis2dh interrupt		
 		#ifdef USE_LIS2DH 
 			if(lis_int1_flag)										
@@ -1149,7 +1066,6 @@ void main(void)
 			bas_counter=0;
 			bas_notify();
 		}
-
 
 //--------------------------------------------------------------- 
 		k_sleep(K_MSEC(1000));

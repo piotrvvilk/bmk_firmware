@@ -52,6 +52,8 @@ int hid_buttons_press(const uint8_t *keys, size_t cnt);
 int hid_buttons_release(const uint8_t *keys, size_t cnt);
 void device_active_time_reset(void);
 void device_active_time_stop(void);
+void display_default_time_reset(void);
+void display_default_time_stop(void);		
 void num_comp_reply(bool accept);
 
 

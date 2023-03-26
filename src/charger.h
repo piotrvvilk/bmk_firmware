@@ -14,7 +14,7 @@
 #define                 CHARGER_DONE                2
 
 //------------------------------------------------------- types
-typedef struct charger_data
+typedef struct charger_data_def
 {
     uint32_t            usb_status;		                    //connected/disconnected 			    
     uint32_t            charger_status;					    //charging/cherged/disable    

@@ -1,3 +1,6 @@
+//---------------------------------------------------------------------------
+// Includes
+//---------------------------------------------------------------------------
 #include <stddef.h>
 #include <string.h>
 #include <errno.h>
@@ -19,24 +22,35 @@
 #include <zephyr/logging/log.h>
 
 #include "main.h"
-#include "matrix_keyboard.h"
 #include "config_app.h"
 #include "board.h"
+#include "matrix_keyboard.h"
+#include "keyboard_sequences.h"
 #include "led.h"
 #include "display.h"
-
+//---------------------------------------------------------------------------
+// Definitions 
+//---------------------------------------------------------------------------
+#ifdef DEBUG_LOG_MATRIX_KEYBOARD
+	LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
+#endif	
+//---------------------------------------------------------------------------
+// Local objects 
+//---------------------------------------------------------------------------
 static uint32_t 	key_pressed;
 static uint32_t		keyboard_blocked;
 static uint32_t		key_unlock_counter;
 
-
+//---------------------------------------------------------------------------
+// Global objects 
+//---------------------------------------------------------------------------
 uint32_t			led_key_pressed;
 uint8_t 			device_theme=THEME_INFO;									//color, display, pwm_led, led_strip
 uint8_t				last_theme;
 
-#ifdef DEBUG_LOG_MATRIX_KEYBOARD
-	LOG_MODULE_REGISTER(my_bmk_keyboard,LOG_LEVEL_DBG);
-#endif	
+//---------------------------------------------------------------------------
+// Implementation 
+//---------------------------------------------------------------------------
 
 //==================================================================================================================================================
 static uint32_t check_keyboard(void)
@@ -81,84 +95,103 @@ static uint32_t check_keyboard(void)
 	return result;
 }	
 
-//==================================================================================================================================================
-static void check_functions_key(void)
+//===============================================================================================================
+static uint8_t key_sequence(const uint8_t *key_tab)
 {
+	uint8_t table_size=0;
+	uint8_t i=0;
+
+	if(key_tab[i]==0xFF) return 1;
+
+	while((key_tab[i])!=KEY_EOS)
+	{
+		i++; table_size++;
+	 	if(i>32) return 1;
+	}
+	table_size++;	
+	LOG_INF("Table size: %d, ", table_size);	
+
+	for(i=0;i<table_size;i++)
+	{
+		switch(key_tab[i])
+		{
+			case KEY_PRESS:
+				LOG_INF("Key press: %d",*(key_tab+i+1));
+				hid_buttons_press(&key_tab[i+1], 1);
+				k_msleep(100);
+				hid_buttons_release(&key_tab[i+1], 1);			
+				k_msleep(100);
+			break;
+
+			case KEY_RELEASE:
+				hid_buttons_release(&key_tab[i+1], 1);
+				k_msleep(100);
+			break;
+
+			case KEY_HOLD:
+				hid_buttons_press(&key_tab[i+1], 1);
+				k_msleep(100);
+			break;
+
+			case KEY_EOS:
+				LOG_INF("End of sequence");
+				return 0;
+			break;
+		}
+
+	}
+	return 0;
+}
+
+//==================================================================================================================================================
+static uint8_t check_functions_key(void)
+{
+	uint8_t offset;
+
+	if((device_theme>THEME_FIRST)&&(device_theme<THEME_LAST+1))
+	{
+		offset = device_theme-2;
+	}
+	else 
+	{
+		return 1;
+	}
+	
 	switch(key_pressed)
 	{
 		case 2:
-			#ifdef DEBUG_LOG_MATRIX_KEYBOARD
-				LOG_INF("FUNC KEY2");
-			#endif
-
-			static const uint8_t mik[] = {
- 			0xE1,	
- 			0x10,	
- 			0x0C,	
- 			0x0E,
-			0x28	
-			 };
-
-			hid_buttons_press(&mik[0], 1);
-			hid_buttons_press(&mik[1], 1);
-			k_msleep(50);
-			hid_buttons_release(&mik[1], 1);
-			hid_buttons_release(&mik[0], 1);
-			k_msleep(50);
-			hid_buttons_press(&mik[2], 1);
-			k_msleep(50);
-			hid_buttons_release(&mik[2], 1);
-			hid_buttons_press(&mik[3], 1);
-			k_msleep(50);
-			hid_buttons_release(&mik[3], 1);
-			hid_buttons_press(&mik[4], 1);
-			k_msleep(50);
-			hid_buttons_release(&mik[4], 1);
-
+			key_sequence(*(ptr_seq_k2+offset));	
 		break;
 
 		case 4:
-
-
-
+			key_sequence(*(ptr_seq_k4+offset));	
 		break;
 
 		case 5:
-
-
-
+			key_sequence(*(ptr_seq_k5+offset));
 		break;
 
 		case 6:
-
-
-
+			key_sequence(*(ptr_seq_k6+offset));	
 		break;
 
 		case 7:
-
-
-
+			key_sequence(*(ptr_seq_k7+offset));	
 		break;
 
 		case 8:
-
-
-
+			key_sequence(*(ptr_seq_k8+offset));		
 		break;
 
 		case 9:
-
-
-
+			key_sequence(*(ptr_seq_k9+offset));		
 		break;
 
 		case 10:
-
-
-
+			key_sequence(*(ptr_seq_k10+offset));		
 		break;
-	}	
+	}
+	return 0;	
 }
 
 //==================================================================================================================================================
@@ -208,19 +241,19 @@ static void keyboard_handler(void)
 		
 		led_key_pressed=key_pressed;													//led blink 
 		keyboard_blocked=1;																//keyboard locked
-		if(key_pressed==1)																//next theme											
+		if(key_pressed==3)																//next theme											
 		{
 			device_theme++;
 			if(device_theme>THEME_LAST) device_theme=THEME_FIRST;
 		}
 
-		if(key_pressed==3)																//previous theme
+		if(key_pressed==1)																//previous theme
 		{
 			device_theme--;
 			if(device_theme<THEME_FIRST) device_theme=THEME_LAST;		
 		}
 
-		check_functions_key();															//check key with macro functions
+		check_functions_key();															//check key with macro functions (2,4-10)
 
 	}
 }
@@ -247,10 +280,6 @@ void thread_keyboard(void)
 					key_pressed=0;
 					led_key_pressed=key_pressed;
 				}
-
-				#ifdef DEBUG_LOG_MATRIX_KEYBOARD
-						LOG_INF("KEY PRESSED: %d\n",key_pressed);
-				#endif
 			}
 		}
 

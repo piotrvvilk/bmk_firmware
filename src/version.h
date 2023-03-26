@@ -4,14 +4,14 @@
 #include <string.h>
 
 #define     VERSION_MAJOR       0
-#define     VERSION_MINOR       23
+#define     VERSION_MINOR       24
 
 #define     DATE_YY             23    
 #define     DATE_MM             03
-#define     DATE_DD             19
+#define     DATE_DD             26
 
-#define     STR_VER             "Ver.0.23"
-#define     STR_DATE            "2023-03-19"
+#define     STR_VER             "Ver.0.24"
+#define     STR_DATE            "2023-03-26"
 
 #endif
 

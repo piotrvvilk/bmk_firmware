@@ -41,7 +41,7 @@ LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 
 #define RGB(_r, _g, _b) { .r = (_r), .b = (_b), .g = (_g) }
 
-static const struct led_rgb colors[] = {
+const struct led_rgb colors[] = {
 	RGB(0x00, 0x00, 0x00), 						/* black */
 	RGB(0x20, 0x2F, 0x2F), 						/* white */
 	RGB(0x2f, 0x00, 0x00), 						/* red */
@@ -57,12 +57,12 @@ struct led_rgb pixels[STRIP_NUM_PIXELS];
 
 static const struct device *const strip = DEVICE_DT_GET(STRIP_NODE);
 
-union Pat{
+typedef union pat_def{
 	struct led_rgb pix[STRIP_NUM_PIXELS];
 	uint8_t data[4*STRIP_NUM_PIXELS];
-};
+}pat_def_t;
 
-static union Pat my_pix;						     						//led strip buffer
+static pat_def_t my_pix;						     						//led strip buffer
 const uint8_t *current_pattern;												//pointer to current led strip pattern
 
 //--------------------------------------------------------------------------- LED PWM
