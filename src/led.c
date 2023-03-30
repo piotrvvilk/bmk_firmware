@@ -31,13 +31,13 @@
 #include "config_app.h"
 #include "charger.h"
 
-
+//---------------------------------------------------------------------------
+// Definitions 
+//---------------------------------------------------------------------------
 LOG_MODULE_REGISTER(my_bmk_led,LOG_LEVEL_DBG);
 
-//--------------------------------------------------------------------------- LED STRIP
 #define STRIP_NODE			DT_ALIAS(led_strip)
 #define STRIP_NUM_PIXELS	DT_PROP(DT_ALIAS(led_strip), chain_length)
-
 
 #define RGB(_r, _g, _b) { .r = (_r), .b = (_b), .g = (_g) }
 

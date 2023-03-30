@@ -17,15 +17,92 @@
 
 //------------------------------------------------------------ program 1 - GTA
 static const uint8_t seq_p1_k2[] = {0xFF};
-static const uint8_t seq_p1_k4[] = {0xFF};
+static const uint8_t seq_p1_k4[] = {KEY_PRESS, KEY_M,                          //sparrow
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_EOS
+                                    };
+
 static const uint8_t seq_p1_k5[] = {0xFF};
-static const uint8_t seq_p1_k6[] = {0xFF};
-static const uint8_t seq_p1_k7[] = {0xFF};
-static const uint8_t seq_p1_k8[] = {0xFF};
-static const uint8_t seq_p1_k9[] = {0xFF};
-static const uint8_t seq_p1_k10[] = {KEY_PRESS, KEY_P,
-                                     KEY_PRESS, KEY_R,
-                                     KEY_PRESS, KEY_1,
+static const uint8_t seq_p1_k6[] = {KEY_PRESS, KEY_UP,                          //mechanic
+                                    KEY_PRESS, KEY_RIGHT,
+                                    KEY_PRESS, KEY_UP,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_UP,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_EOS
+                                    };
+
+static const uint8_t seq_p1_k7[] = {KEY_PRESS, KEY_UP,                          //Lester
+                                    KEY_PRESS, KEY_RIGHT,
+                                    KEY_PRESS, KEY_UP,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_LEFT,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_EOS
+                                    };
+
+static const uint8_t seq_p1_k8[] = {KEY_PRESS, KEY_M,                          //heavy
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_EOS
+                                    };
+
+static const uint8_t seq_p1_k9[] = {KEY_PRESS, KEY_M,                          //full
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_ENTER,
+                                    KEY_EOS                              
+                                    };
+
+static const uint8_t seq_p1_k10[] = {KEY_PRESS, KEY_M,                          //food
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_ENTER,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_DOWN,
+                                     KEY_PRESS, KEY_ENTER,
+                                     KEY_PRESS, KEY_ENTER,
                                      KEY_EOS
                                     };
 

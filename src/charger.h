@@ -1,7 +1,9 @@
 #ifndef CHARGER_H__
 #define CHARGER_H__
 
-//------------------------------------------------------- thread
+//---------------------------------------------------------------------------
+// Definitions 
+//---------------------------------------------------------------------------
 #define THREAD_CHARGER_PRIORITY 					7
 #define THREAD_CHARGER_STACKSIZE       			    512
 
@@ -13,7 +15,6 @@
 #define                 CHARGER_CHARGING            1
 #define                 CHARGER_DONE                2
 
-//------------------------------------------------------- types
 typedef struct charger_data_def
 {
     uint32_t            usb_status;		                    //connected/disconnected 			    
@@ -26,10 +27,14 @@ typedef struct charger_data_def
     bool 				charger_locked;                     //true when charged first time, prevent continuous switch between charging and charged 
 }charger_data_t;
 
-//------------------------------------------------------- global variables
+//---------------------------------------------------------------------------
+// Global objects 
+//---------------------------------------------------------------------------
 extern charger_data_t     charger_data;
 
-//------------------------------------------------------- public functions
+//---------------------------------------------------------------------------
+// Public functions
+//---------------------------------------------------------------------------
 void thread_charger(void);
 
 #endif
