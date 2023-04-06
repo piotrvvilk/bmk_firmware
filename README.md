@@ -1,9 +1,7 @@
 
 ![photo](images/main.jpg)
 
-### About
-
- BMK firmware :computer:
+### BMK firmware :computer:
 
 ### Changelog :calendar:
 
