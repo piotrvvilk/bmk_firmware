@@ -1,4 +1,6 @@
 
+![photo](images/main.jpg)
+
 ### About
 
  BMK firmware :computer:
