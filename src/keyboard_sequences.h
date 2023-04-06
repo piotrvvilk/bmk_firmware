@@ -10,10 +10,11 @@
 // Definitions 
 //---------------------------------------------------------------------------
 #define         KEY_PRESS           1
-#define         KEY_HOLD            2
-#define         KEY_RELEASE         3
-#define         KEY_WAIT            4
-#define         KEY_EOS             5
+#define         KEY_PRESS_L         2
+#define         KEY_HOLD            3
+#define         KEY_RELEASE         4
+#define         KEY_WAIT            5
+#define         KEY_EOS             6
 
 //------------------------------------------------------------ program 1 - GTA
 static const uint8_t seq_p1_k2[] = {0xFF};
@@ -35,7 +36,7 @@ static const uint8_t seq_p1_k4[] = {KEY_PRESS, KEY_M,                          /
                                     };
 
 static const uint8_t seq_p1_k5[] = {0xFF};
-static const uint8_t seq_p1_k6[] = {KEY_PRESS, KEY_UP,                          //mechanic
+static const uint8_t seq_p1_k6[] = {KEY_PRESS_L, KEY_UP,                        //mechanic
                                     KEY_PRESS, KEY_RIGHT,
                                     KEY_PRESS, KEY_UP,
                                     KEY_PRESS, KEY_ENTER,
@@ -47,7 +48,7 @@ static const uint8_t seq_p1_k6[] = {KEY_PRESS, KEY_UP,                          
                                     KEY_EOS
                                     };
 
-static const uint8_t seq_p1_k7[] = {KEY_PRESS, KEY_UP,                          //Lester
+static const uint8_t seq_p1_k7[] = {KEY_PRESS_L, KEY_UP,                        //Lester
                                     KEY_PRESS, KEY_RIGHT,
                                     KEY_PRESS, KEY_UP,
                                     KEY_PRESS, KEY_ENTER,
@@ -66,7 +67,7 @@ static const uint8_t seq_p1_k8[] = {KEY_PRESS, KEY_M,                          /
                                     KEY_PRESS, KEY_DOWN,
                                     KEY_PRESS, KEY_DOWN,
                                     KEY_PRESS, KEY_DOWN,
-                                    KEY_PRESS, KEY_DOWN,
+                                    KEY_PRESS, KEY_DOWN,    
                                     KEY_PRESS, KEY_ENTER,
                                     KEY_PRESS, KEY_DOWN,
                                     KEY_PRESS, KEY_DOWN,

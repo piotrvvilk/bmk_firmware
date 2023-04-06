@@ -120,7 +120,15 @@ static uint8_t key_sequence(const uint8_t *key_tab)
 				hid_buttons_press(&key_tab[i+1], 1);
 				k_msleep(100);
 				hid_buttons_release(&key_tab[i+1], 1);			
+				k_msleep(150);
+			break;
+
+			case KEY_PRESS_L:
+				LOG_INF("Key press: %d",*(key_tab+i+1));
+				hid_buttons_press(&key_tab[i+1], 1);
 				k_msleep(100);
+				hid_buttons_release(&key_tab[i+1], 1);			
+				k_msleep(1000);
 			break;
 
 			case KEY_RELEASE:

@@ -2,7 +2,7 @@
     "nrf-connect.applications": [
         "${workspaceFolder}"
     ],
-    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.2.0}",
+    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.3.0}",
     "files.associations": {
         "dk_buttons_and_leds.h": "c",
         "slist.h": "c",
@@ -36,5 +36,5 @@
     "nrf-connect.debugging.bindings": {
         "${workspaceFolder}/build_1": "Launch build_1"
     },
-    "nrf-connect.topdir": "${nrf-connect.sdk:2.2.0}"
+    "nrf-connect.topdir": "${nrf-connect.sdk:2.3.0}"
 }
