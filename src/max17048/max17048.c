@@ -10,7 +10,10 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
+#include "../config_app.h"
 #include "max17048.h"
+
+#ifdef USE_MAX17048
 
 const struct device *const i2c_max17048_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
@@ -152,4 +155,4 @@ int MAX17048GetVersion(uint32_t *data)
 }
  
 //===============================================================================================================
-
+#endif

@@ -6,10 +6,14 @@
     #endif
 #endif
 
+#include "../config_app.h"
+
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
     #include "lvgl.h"
 #else
-    #include "lvgl/lvgl.h"
+  //#ifdef USE_DISPLAY 
+    //#include "lvgl/lvgl.h"
+  //#endif
 #endif
 
 
@@ -21,7 +25,6 @@
 #define LV_ATTRIBUTE_IMG_BLE
 #endif
 
-#include "../config_app.h"
 
 #ifdef USE_BLE_PICTURE
 

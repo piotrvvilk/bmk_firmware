@@ -1,4 +1,6 @@
-
+//---------------------------------------------------------------------------
+// Includes
+//---------------------------------------------------------------------------
 #include <zephyr/types.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -25,8 +27,9 @@
 #include "main.h"
 #include "board.h"
 
-//#define USER_BUTTON             DK_BTN1_MSK
-
+//---------------------------------------------------------------------------
+// Definitions 
+//---------------------------------------------------------------------------
 const struct gpio_dt_spec led_red = GPIO_DT_SPEC_GET(LEDR_NODE, gpios);
 const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(LEDG_NODE, gpios);
 const struct gpio_dt_spec led_blue = GPIO_DT_SPEC_GET(LEDB_NODE, gpios);
@@ -59,12 +62,13 @@ const struct gpio_dt_spec dispcs = GPIO_DT_SPEC_GET(DISPCS_NODE, gpios);
 //const struct gpio_dt_spec dispdata = GPIO_DT_SPEC_GET(DISPDATA_NODE, gpios);
 //const struct gpio_dt_spec dispclk = GPIO_DT_SPEC_GET(DISPCLK_NODE, gpios);
 
-//==================================================================================================================================================
+//---------------------------------------------------------------------------
+// Implementation 
+//---------------------------------------------------------------------------
+//===============================================================================================================
 int gpio_init(void)
 {
-	int ret;
-
-	ret=0;
+	int ret=0;
 
 	if(!device_is_ready(col1.port)) return -1;
 	if(!device_is_ready(col2.port)) return -1;
@@ -101,28 +105,14 @@ int gpio_init(void)
 	ret = gpio_pin_configure_dt(&usbdet, GPIO_INPUT);
 	if(ret!=0) return ret;
 	
-	ret = gpio_pin_configure_dt(&chrgen, GPIO_OUTPUT);
-	if(ret!=0) return ret;
-	gpio_pin_set_dt(&chrgen,0);
+	charger_off();
 
 	ret = gpio_pin_configure_dt(&chrgdet, GPIO_INPUT);
 	if(ret!=0) return ret;
-		
-	// ret = gpio_pin_configure_dt(&disprst, GPIO_OUTPUT);
-	// if(ret!=0) return ret;
-	// gpio_pin_set_dt(&disprst,1);
 
 	ret = gpio_pin_configure_dt(&dispbk, GPIO_OUTPUT);
 	if(ret!=0) return ret;
 	gpio_pin_set_dt(&dispbk,0);
-
-	// ret = gpio_pin_configure_dt(&dispdc, GPIO_OUTPUT);
-	// if(ret!=0) return ret;
-	// gpio_pin_set_dt(&dispdc,0);
-
-	// ret = gpio_pin_configure_dt(&dispcs, GPIO_OUTPUT);
-	// if(ret!=0) return ret;
-	// gpio_pin_set_dt(&dispcs,1);
 
 	ret = gpio_pin_configure_dt(&accelint1, GPIO_INPUT);
 	if(ret!=0) return ret;
@@ -156,4 +146,24 @@ int gpio_init(void)
 	return ret;
 }
 
-//==================================================================================================================================================
+//===============================================================================================================
+int charger_on(void)
+{
+	int ret=0;
+	
+	ret = gpio_pin_configure_dt(&chrgen, GPIO_OUTPUT);
+	if(ret!=0) return ret;
+	gpio_pin_set_dt(&chrgen,0);
+
+	return 0;
+}
+
+//===============================================================================================================
+int charger_off(void)
+{
+	int ret=0;
+	ret = gpio_pin_configure_dt(&chrgen, GPIO_INPUT);
+	return ret;
+}
+
+//===============================================================================================================

@@ -109,14 +109,14 @@ static uint8_t key_sequence(const uint8_t *key_tab)
 	 	if(i>32) return 1;
 	}
 	table_size++;	
-	LOG_INF("Table size: %d, ", table_size);	
+	//LOG_INF("Table size: %d, ", table_size);	
 
 	for(i=0;i<table_size;i++)
 	{
 		switch(key_tab[i])
 		{
 			case KEY_PRESS:
-				LOG_INF("Key press: %d",*(key_tab+i+1));
+				//LOG_INF("Key press: %d",*(key_tab+i+1));
 				hid_buttons_press(&key_tab[i+1], 1);
 				k_msleep(100);
 				hid_buttons_release(&key_tab[i+1], 1);			
@@ -124,7 +124,7 @@ static uint8_t key_sequence(const uint8_t *key_tab)
 			break;
 
 			case KEY_PRESS_L:
-				LOG_INF("Key press: %d",*(key_tab+i+1));
+				//LOG_INF("Key press: %d",*(key_tab+i+1));
 				hid_buttons_press(&key_tab[i+1], 1);
 				k_msleep(100);
 				hid_buttons_release(&key_tab[i+1], 1);			
@@ -142,7 +142,7 @@ static uint8_t key_sequence(const uint8_t *key_tab)
 			break;
 
 			case KEY_EOS:
-				LOG_INF("End of sequence");
+				//LOG_INF("End of sequence");
 				return 0;
 			break;
 		}

@@ -1,3 +1,6 @@
+//---------------------------------------------------------------------------
+// Includes
+//---------------------------------------------------------------------------
 #include <stddef.h>
 #include <string.h>
 #include <errno.h>
@@ -13,10 +16,15 @@
 #include <assert.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/settings/settings.h>
+#include <zephyr/pm/pm.h>
+#include <zephyr/pm/device.h>
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/display.h>
-#include <lvgl.h>
+//#include <zephyr/drivers/spi.h>
+
+//#include <lvgl.h>
+
 
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
@@ -230,31 +238,39 @@ void display_info_screen(void)
 	
 	lcd_backlight_on();		
 }
-
+#endif
 //==================================================================================================================================================
 void thread_lcd(void)
 {
 //-------------------------------------------------------------------------------------- display init
 	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
-	if (!device_is_ready(display_dev)) 
-	{
-		LOG_ERR("Device not ready, aborting test");
-		return;
-	}
-	lcd_backlight_on();
+	// if (!device_is_ready(display_dev)) 
+	// {
+	// 	LOG_ERR("Device not ready, aborting test");
+	// 	return;
+	// }
+	//lcd_backlight_on();
 
 //-------------------------------------------------------------- 			
-	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+	// lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-	LV_IMG_DECLARE(logo);
-	lv_obj_t * img1 = lv_img_create(lv_scr_act());
-	lv_img_set_src(img1, &logo);
-	lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_size(img1, 240, 160);
-	lv_task_handler();
-	display_blanking_off(display_dev);
+	// LV_IMG_DECLARE(logo);
+	// lv_obj_t * img1 = lv_img_create(lv_scr_act());
+	// lv_img_set_src(img1, &logo);
+	// lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+	// lv_obj_set_size(img1, 240, 160);
+	// lv_task_handler();
+	// display_blanking_off(display_dev);
     
+	//nrfx_spim_uninit(&spi3);
+	//display_blanking_off(display_dev);
+	
+	pm_device_action_run(display_dev, PM_DEVICE_ACTION_SUSPEND);
+	
+	
+	
+
 	while(1)
 	{
 //-------------------------------------------------------------------------------------- pairing process
@@ -262,17 +278,17 @@ void thread_lcd(void)
 		// {
 	 		if(lcd_pairing_state==PAIRING)
 			{
-				display_pairing();
+			//	display_pairing();
 			}
 
 			else if(lcd_pairing_state==PAIRED)
 			{
-				display_paired();
+			//	display_paired();
 			}
 			
 			else if(lcd_pairing_state==PAIRING_CANCELED)
 			{
-				display_canceled();
+			//	display_canceled();
 			}
 		//}
 		else
@@ -284,58 +300,58 @@ void thread_lcd(void)
 //-------------------------------------------------------------------------------------- gta theme
 				if(device_theme==THEME_GTA)
 				{
-					display_theme=device_theme;									
-					LV_IMG_DECLARE(gta);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-					lv_img_set_src(img1, &gta);
-					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-					lv_obj_set_size(img1, 320, 190);
-					lv_task_handler();
-					display_blanking_off(display_dev);
-					lcd_backlight_on();
+					// display_theme=device_theme;									
+					// LV_IMG_DECLARE(gta);
+					// lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					// lv_img_set_src(img1, &gta);
+					// lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					// lv_obj_set_size(img1, 320, 190);
+					// lv_task_handler();
+					//display_blanking_off(display_dev);
+					// lcd_backlight_on();
 				}
 
 //-------------------------------------------------------------------------------------- altium theme			
 				if(device_theme==THEME_ALTIUM)
 				{
-					display_theme=device_theme;
-					lv_obj_clean(lv_scr_act());
-					LV_IMG_DECLARE(altium);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-					lv_img_set_src(img1, &altium);
-					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-					lv_obj_set_size(img1, 220, 160);
-					lv_task_handler();
-					display_blanking_off(display_dev);
-					lcd_backlight_on();
+					// display_theme=device_theme;
+					// lv_obj_clean(lv_scr_act());
+					// LV_IMG_DECLARE(altium);
+					// lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					// lv_img_set_src(img1, &altium);
+					// lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					// lv_obj_set_size(img1, 220, 160);
+					// lv_task_handler();
+					// display_blanking_off(display_dev);
+					// lcd_backlight_on();
 				}
 
 //-------------------------------------------------------------------------------------- vsc theme			
 				if(device_theme==THEME_VSC)
 				{
-					display_theme=device_theme;
-					lv_obj_clean(lv_scr_act());
-					LV_IMG_DECLARE(vsc);
-					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-					lv_img_set_src(img1, &vsc);
-					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-					lv_obj_set_size(img1, 220, 160);
-					lv_task_handler();
-					display_blanking_off(display_dev);
-					lcd_backlight_on();
+					// display_theme=device_theme;
+					// lv_obj_clean(lv_scr_act());
+					// LV_IMG_DECLARE(vsc);
+					// lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					// lv_img_set_src(img1, &vsc);
+					// lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					// lv_obj_set_size(img1, 220, 160);
+					// lv_task_handler();
+					// display_blanking_off(display_dev);
+					// lcd_backlight_on();
 				}
 
 //-------------------------------------------------------------------------------------- info theme			
 				if(device_theme==THEME_INFO)
 				{
-					display_info_screen();									
+					//display_info_screen();									
 				}	
 
 //-------------------------------------------------------------------------------------- no theme			
 				if(device_theme==NO_THEME)
 				{
-					lcd_backlight_off();
-					display_theme=device_theme;
+					//lcd_backlight_off();
+					//display_theme=device_theme;
 					
 				}
 			}
@@ -345,7 +361,7 @@ void thread_lcd(void)
 }
 
 
-#endif
+//#endif
 
 //==================================================================================================================================================
 

@@ -22,11 +22,14 @@ int8_t			x_l_axis, y_l_axis, z_l_axis;
 uint8_t 		accel_temp;
 bool 			lis_int1_flag;
 
+#ifdef USE_LIS2DH
+
 const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
 #ifdef DEBUG_LOG_LIS2DH  
 	LOG_MODULE_REGISTER(my_bmk_lis,LOG_LEVEL_DBG);
 #endif	
+
 
 //---------------------------------------------------------------------------
 // Implementation 
@@ -182,8 +185,8 @@ void accel_movement_detect(uint32_t val)
 	
 	lis2dh_write_reg(LIS2DH_REG4,0x80);         					//BDU on, BLE off, 2G, HR=0, no self test
 	
-	//lis2dh_write_reg(LIS2DH_REG5,0x00);         					//no boot, fifo disable, int1 not latched,4D int1 disable, int2 not latched, 4D int2 disable
-	lis2dh_write_reg(LIS2DH_REG5,0x08);         					//int1 latched,
+	lis2dh_write_reg(LIS2DH_REG5,0x00);         					//no boot, fifo disable, int1 not latched,4D int1 disable, int2 not latched, 4D int2 disable
+	//lis2dh_write_reg(LIS2DH_REG5,0x08);         					//int1 latched,
 	//lis2dh_write_reg(LIS2DH_REG5,0x0C);         					//int1 latched, 4D int1 enable, 
 	
 	lis2dh_write_reg(LIS2DH_REG6,0x00);         					//click int2 off, int1 on int2 off, int2 on ont2 off, boot on int2 off, activity on int2 off, int active high
@@ -311,4 +314,4 @@ void accel_power_down(void)
 }
 
 //===============================================================================================================
-
+#endif

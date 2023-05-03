@@ -13,7 +13,6 @@
 //sio26 
 //sio28
 
-
 //nrf_gpio_cfg_input(CHRG_MON, NRF_GPIO_PIN_PULLUP);
 //nrf_gpio_cfg_input(USB_DETECT, NRF_GPIO_PIN_NOPULL);
 //nrf_gpio_cfg_input(ACCEL_INT_1, NRF_GPIO_PIN_PULLDOWN);
@@ -94,11 +93,8 @@ extern const struct gpio_dt_spec dispdc;
 #define     vled_on()               gpio_pin_set_dt(&vleden,1);
 #define     vled_off()              gpio_pin_set_dt(&vleden,0);
 
-#define     charger_on()            gpio_pin_set_dt(&chrgen,0);
-#define     charger_off()           gpio_pin_set_dt(&chrgen,1);
-
-#define     lcd_backlight_on()      gpio_pin_set_dt(&dispbk,1);
-#define     lcd_backlight_off()     gpio_pin_set_dt(&dispbk,0);
+#define     lcd_backlight_on()      gpio_pin_set_dt(&dispbk,1)
+#define     lcd_backlight_off()     gpio_pin_set_dt(&dispbk,0)
 
 #define     RST_H()                 gpio_pin_set_dt(&disprst,1);
 #define     RST_L()                 gpio_pin_set_dt(&disprst,0);
@@ -111,7 +107,8 @@ extern const struct gpio_dt_spec dispdc;
 
 //----------------------------------------------------------------- 
 int gpio_init(void);
-
+int charger_on(void);
+int charger_off(void);
 
 
 #endif 

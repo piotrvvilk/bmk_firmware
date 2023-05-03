@@ -30,7 +30,11 @@
         "lv_example_get_started.h": "c",
         "errno.h": "c",
         "stddef.h": "c",
-        "led.h": "c"
+        "led.h": "c",
+        "spi.h": "c",
+        "pm.h": "c",
+        "lis2dh.h": "c",
+        "devicetree.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "nrf-connect.debugging.bindings": {

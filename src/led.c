@@ -20,6 +20,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/led_strip.h>
 #include <zephyr/drivers/led.h>
+#include <zephyr/pm/pm.h>
+#include <zephyr/pm/device.h>
 
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
@@ -338,6 +340,10 @@ void thread_led(void)
 					if(charger_data.usb_status==USB_DISCONNECTED)							//turn off boost only when usb is unpluged
 					{
 						vled_off()
+						pm_device_action_run(led_pwm, PM_DEVICE_ACTION_SUSPEND);
+						//pm_device_action_run(led_pwm, PM_DEVICE_ACTION_SUSPEND);
+
+
 					}
 				}
 			}

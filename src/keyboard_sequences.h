@@ -17,7 +17,19 @@
 #define         KEY_EOS             6
 
 //------------------------------------------------------------ program 1 - GTA
-static const uint8_t seq_p1_k2[] = {0xFF};
+static const uint8_t seq_p1_k2[] = {KEY_PRESS, KEY_H,                          //hello world
+                                    KEY_PRESS, KEY_E,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_SPACE,
+                                    KEY_PRESS, KEY_W,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_R,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_D,
+                                    KEY_EOS};
+
 static const uint8_t seq_p1_k4[] = {KEY_PRESS, KEY_M,                          //sparrow
                                     KEY_PRESS, KEY_DOWN,
                                     KEY_PRESS, KEY_DOWN,
@@ -108,12 +120,18 @@ static const uint8_t seq_p1_k10[] = {KEY_PRESS, KEY_M,                          
                                     };
 
 //------------------------------------------------------------ program 2 - ALTIUM
-static const uint8_t seq_p2_k2[] =  {KEY_HOLD, KEY_RIGHTSHIFT, 
-                                     KEY_PRESS, KEY_M,
-                                     KEY_RELEASE, KEY_RIGHTSHIFT,
-                                     KEY_PRESS, KEY_I,
-                                     KEY_PRESS, KEY_K,
-                                     KEY_EOS
+static const uint8_t seq_p2_k2[] =  {KEY_PRESS, KEY_H,                          //hello world
+                                    KEY_PRESS, KEY_E,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_SPACE,
+                                    KEY_PRESS, KEY_W,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_R,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_D,
+                                    KEY_EOS
                                     };
 
 static const uint8_t seq_p2_k4[] =  {0xFF};
@@ -147,7 +165,19 @@ static const uint8_t seq_p2_k10[] = {KEY_PRESS, KEY_P,
 
 
 //------------------------------------------------------------ program 3
-static const uint8_t seq_p3_k2[] = {0xFF};
+static const uint8_t seq_p3_k2[] = {KEY_PRESS, KEY_H,                          //hello world
+                                    KEY_PRESS, KEY_E,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_SPACE,
+                                    KEY_PRESS, KEY_W,
+                                    KEY_PRESS, KEY_O,
+                                    KEY_PRESS, KEY_R,
+                                    KEY_PRESS, KEY_L,
+                                    KEY_PRESS, KEY_D,
+                                    KEY_EOS};
+                                    
 static const uint8_t seq_p3_k4[] = {0xFF};
 static const uint8_t seq_p3_k5[] = {0xFF};
 static const uint8_t seq_p3_k6[] = {0xFF};

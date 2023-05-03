@@ -29,6 +29,9 @@
 #include <bluetooth/services/hids.h>
 #include <zephyr/bluetooth/services/dis.h>
 
+#include <zephyr/pm/pm.h>
+#include <zephyr/pm/device.h>
+
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
 
@@ -169,8 +172,9 @@ struct pairing_data_mitm {
 	unsigned int passkey;
 };
 
-
 K_MSGQ_DEFINE(mitm_queue, sizeof(struct pairing_data_mitm), CONFIG_BT_HIDS_MAX_CLIENT_COUNT, 4);
+
+const struct device *const i2c11_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
 //---------------------------------------------------------------------------
 // Global objects
@@ -933,9 +937,9 @@ void display_default_time_stop(void)							//stop counting
 	K_THREAD_DEFINE(thread_led_id, THREAD_LED_STACKSIZE, thread_led, NULL, NULL, NULL, THREAD_LED_PRIORITY, 0, 0);
 #endif 
 
-#ifdef USE_DISPLAY
-	K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
-#endif
+//#ifdef USE_DISPLAY
+	//K_THREAD_DEFINE(thread_lcd_id, THREAD_LCD_STACKSIZE, thread_lcd, NULL, NULL, NULL, THREAD_LCD_PRIORITY, 0, 0);
+//#endif
 
 #if defined(USE_LIS2DH) || defined(USE_MAX17048)
 	K_THREAD_DEFINE(thread_i2c_devices_id, THREAD_I2C_DEVICES_STACKSIZE, thread_i2c_devices, NULL, NULL, NULL, THREAD_I2C_DEVICES_PRIORITY, 0, 0);
@@ -1002,26 +1006,36 @@ void main(void)
 
 		k_work_init(&pairing_work, pairing_process);
 	#endif
-	
+
+	usb_detection_off();	
+	charger_off();
+
 //===============================================================================================================
 //===============================================================================================================
 	while (1) 
 	{
 //-------------------------------------------------------------- lis2dh interrupt		
-		#ifdef USE_LIS2DH 
-			if(lis_int1_flag)										
-			{
-				lis_int1_flag=false;
-				release_interrupt();		
-				device_active_time_reset();							//start counting
-				device_state=BMK_ACTIVE;
+		// #ifdef USE_LIS2DH 
+		// 	if(lis_int1_flag)										
+		// 	{
+		// 		lis_int1_flag=false;
+
+		// 		pm_device_action_run(i2c11_dev, PM_DEVICE_ACTION_TURN_ON);
+		// 		i2c_init();
 				
-				if(device_theme==NO_THEME)							//restore last theme
-				{
-					device_theme = last_theme;
-				}
-			}	
-		#endif	
+		// 		release_interrupt();		
+				
+		// 		pm_device_action_run(i2c11_dev, PM_DEVICE_ACTION_TURN_OFF);
+
+		// 		device_active_time_reset();							//start counting
+		// 		device_state=BMK_ACTIVE;
+				
+		// 		if(device_theme==NO_THEME)							//restore last theme
+		// 		{
+		// 			device_theme = last_theme;
+		// 		}
+		// 	}	
+		// #endif	
 //--------------------------------------------------------------- timeout
 		#ifdef USE_LED 
 			if(device_active_counter>0) device_active_counter++;	
