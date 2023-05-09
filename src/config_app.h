@@ -2,7 +2,7 @@
 #define CONFIG_APP_H__
 
 //======================================================= APPLICATION FEATURES
-//#define	        USE_DISPLAY                     1
+#define	        USE_DISPLAY                     1
 #ifdef          USE_DISPLAY
     #define	    USE_GTA_PICTURE                 1
     #define	    USE_ALTIUM_PICTURE              1
@@ -18,9 +18,8 @@
 #define	        USE_USB                         1
 #define	        USE_CHARGER                     1
 #define	        USE_LIS2DH                      1
-//#define	        USE_MAX17048                    1
-//#define	        USE_LED                         1
-//#define	        USE_BUZZER                      1
+#define	        USE_MAX17048                    1
+#define	        USE_LED                         1
 
 //======================================================= APPLICATION TEST
 //#define         MAKE_TEST                       1             
@@ -41,7 +40,6 @@
     #define     DEBUG_LOG_I2C_DEVICES           1
     //#define     DEBUG_LOG_USB                   1
     //#define     DEBUG_LOG_CHARGER               1
-    
 
 #endif
 

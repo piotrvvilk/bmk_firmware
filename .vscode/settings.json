@@ -34,7 +34,8 @@
         "spi.h": "c",
         "pm.h": "c",
         "lis2dh.h": "c",
-        "devicetree.h": "c"
+        "devicetree.h": "c",
+        "bas.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "nrf-connect.debugging.bindings": {

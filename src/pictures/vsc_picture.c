@@ -11,9 +11,9 @@
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
     #include "lvgl.h"
 #else
-    //#ifdef USE_DISPLAY 
-    //#include "lvgl/lvgl.h"
-    //#endif
+    #ifdef USE_DISPLAY 
+        #include "lvgl/lvgl.h"
+    #endif
 #endif
 
 

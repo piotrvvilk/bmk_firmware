@@ -59,6 +59,8 @@ struct led_rgb pixels[STRIP_NUM_PIXELS];
 
 static const struct device *const strip = DEVICE_DT_GET(STRIP_NODE);
 
+const struct device *const spi0_dev = DEVICE_DT_GET(DT_NODELABEL(spi0));
+
 typedef union pat_def{
 	struct led_rgb pix[STRIP_NUM_PIXELS];
 	uint8_t data[4*STRIP_NUM_PIXELS];
@@ -78,6 +80,7 @@ uint16_t level;
 uint8_t led_theme;
 
 int err;
+//const struct device *const led_pwm = DEVICE_DT_GET(DT_NODELABEL(pwm0));
 const struct device *led_pwm;
 
 //uint32_t led_demo_counter;													//charging counter - led on keypad (time between following sequences )
@@ -199,59 +202,58 @@ void thread_led(void)
 		set_button_pattern(current_pattern);
 
 	#endif	
-//--------------------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------------------
 	device_theme=THEME_INFO;
 	set_button_pattern(info_pattern);
 
  	while(1)
  	{
-		// if(led_pairing_state!=NO_ACTION)
-		// {
 //-------------------------------------------------------------------------------------- pairing process						
 		if(led_pairing_state==PAIRING)
-			{
-				vled_on()
-				k_msleep(20);
-				led_theme=device_theme;
-				current_pattern = pairing_pattern;	
-				set_button_pattern(current_pattern);
-						
-				led_off(led_pwm, LED_RED_PWM); 
-				led_off(led_pwm, LED_GREEN_PWM); 
-				led_off(led_pwm, LED_BLUE_PWM); 
-				led_pairing_state=PAIRING_ON_DISPLAY;
-			}
+		{
+			pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
+			vled_on()
+			k_msleep(20);
+			led_theme=device_theme;
+			current_pattern = pairing_pattern;	
+			set_button_pattern(current_pattern);
+					
+			led_off(led_pwm, LED_RED_PWM); 
+			led_off(led_pwm, LED_GREEN_PWM); 
+			led_off(led_pwm, LED_BLUE_PWM); 
+			led_pairing_state=PAIRING_ON_DISPLAY;
+		}
 
 		else if(led_pairing_state==PAIRED)
-			{
-				vled_on()
-				k_msleep(20);
-				led_theme=device_theme;
-				current_pattern = turn_off_pattern;	
-				set_button_pattern(current_pattern);
-						
-				led_set_brightness(led_pwm, LED_GREEN_PWM, 100);				
-				led_off(led_pwm, LED_RED_PWM);				
-				led_off(led_pwm, LED_BLUE_PWM); 
-				led_pairing_state=PAIRED_ON_DISPLAY;
-			}
+		{
+			pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
+			vled_on()
+			k_msleep(20);
+			led_theme=device_theme;
+			current_pattern = turn_off_pattern;	
+			set_button_pattern(current_pattern);
+					
+			led_set_brightness(led_pwm, LED_GREEN_PWM, 100);				
+			led_off(led_pwm, LED_RED_PWM);				
+			led_off(led_pwm, LED_BLUE_PWM); 
+			led_pairing_state=PAIRED_ON_DISPLAY;
+		}
 
 		else if(led_pairing_state==PAIRING_CANCELED)
-			{
-				vled_on()
-				k_msleep(20);
-				led_theme=device_theme;
-				current_pattern = turn_off_pattern;	
-				set_button_pattern(current_pattern);
-						
-				led_set_brightness(led_pwm, LED_RED_PWM, 100);				
-				led_off(led_pwm, LED_GREEN_PWM);				
-				led_off(led_pwm, LED_BLUE_PWM); 
-				led_pairing_state=PAIRING_CANCELED_ON_DISPLAY;
-			}
-
-		//}
+		{
+			pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
+			vled_on()
+			k_msleep(20);
+			led_theme=device_theme;
+			current_pattern = turn_off_pattern;	
+			set_button_pattern(current_pattern);
+					
+			led_set_brightness(led_pwm, LED_RED_PWM, 100);				
+			led_off(led_pwm, LED_GREEN_PWM);				
+			led_off(led_pwm, LED_BLUE_PWM); 
+			led_pairing_state=PAIRING_CANCELED_ON_DISPLAY;
+		}
 		else
 		{
 			if((device_theme!=led_theme)||(refresh_led_flag==true))
@@ -263,6 +265,7 @@ void thread_led(void)
 				
 				if(device_theme==THEME_GTA)
 				{
+					pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
 					vled_on()																//led power on
 					k_msleep(20);															//wait to led inside driver
 					led_theme=device_theme;													//don't repeat this condition all the time 
@@ -279,6 +282,7 @@ void thread_led(void)
 
 				if(device_theme==THEME_ALTIUM)											//another theme 
 				{
+					pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
 					vled_on()
 					k_msleep(20);
 					led_theme=device_theme;
@@ -295,6 +299,7 @@ void thread_led(void)
 
 				if(device_theme==THEME_VSC)
 				{
+					pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
 					vled_on()
 					k_msleep(20);
 					led_theme=device_theme;
@@ -307,12 +312,12 @@ void thread_led(void)
 						led_off(led_pwm, LED_RED_PWM); 
 						led_off(led_pwm, LED_GREEN_PWM); 
 						led_set_brightness(led_pwm, LED_BLUE_PWM, 100);
-						
 					}
 				}
 
 				if(device_theme==THEME_INFO)
 				{
+					pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_RESUME);
 					vled_on()
 					k_msleep(20);
 					led_theme=device_theme;
@@ -340,10 +345,7 @@ void thread_led(void)
 					if(charger_data.usb_status==USB_DISCONNECTED)							//turn off boost only when usb is unpluged
 					{
 						vled_off()
-						pm_device_action_run(led_pwm, PM_DEVICE_ACTION_SUSPEND);
-						//pm_device_action_run(led_pwm, PM_DEVICE_ACTION_SUSPEND);
-
-
+						pm_device_action_run(spi0_dev, PM_DEVICE_ACTION_SUSPEND);
 					}
 				}
 			}
