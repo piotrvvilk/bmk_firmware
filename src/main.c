@@ -174,7 +174,7 @@ struct pairing_data_mitm {
 
 K_MSGQ_DEFINE(mitm_queue, sizeof(struct pairing_data_mitm), CONFIG_BT_HIDS_MAX_CLIENT_COUNT, 4);
 
-const struct device *const i2c11_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
+const struct device *const i2c1_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 
 //---------------------------------------------------------------------------
 // Global objects
@@ -949,7 +949,6 @@ void display_default_time_stop(void)							//stop counting
 	K_THREAD_DEFINE(thread_charger_id, THREAD_CHARGER_STACKSIZE, thread_charger, NULL, NULL, NULL, THREAD_CHARGER_PRIORITY, 0, 0);
 #endif
 
-
 //---------------------------------------------------------------------------
 // Main  
 //---------------------------------------------------------------------------
@@ -1020,12 +1019,12 @@ void main(void)
 			{
 				lis_int1_flag=false;
 
-				pm_device_action_run(i2c11_dev, PM_DEVICE_ACTION_RESUME);
+				pm_device_action_run(i2c1_dev, PM_DEVICE_ACTION_RESUME);
 				i2c_init();
 				
 				release_interrupt();		
 				
-				pm_device_action_run(i2c11_dev, PM_DEVICE_ACTION_SUSPEND);
+				pm_device_action_run(i2c1_dev, PM_DEVICE_ACTION_SUSPEND);
 
 				device_active_time_reset();							//start counting
 				device_state=BMK_ACTIVE;
@@ -1040,7 +1039,7 @@ void main(void)
 		#ifdef USE_LED 
 			if(device_active_counter>0) device_active_counter++;	
 
-			if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                  QUESTION: MUTEX?
+			if(device_active_counter>DEVICE_ACTIVE_TIME)			//timeout - display and led power off                 
 			{
 				#ifdef DEBUG_LOG_DEVICE
 					LOG_INF("Timeout\n");		
@@ -1082,7 +1081,7 @@ void main(void)
 		}
 
 //--------------------------------------------------------------- 
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(100));
     }
 	
 }

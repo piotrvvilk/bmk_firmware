@@ -47,7 +47,7 @@
 static uint32_t max17048_read_counter;
 static uint32_t max17048_voltage;
 
-const struct device *const i2c1_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
+const struct device *const i2c1_1_dev = DEVICE_DT_GET(DT_NODELABEL(i2c1));
 //---------------------------------------------------------------------------
 // Global objects 
 //---------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void thread_i2c_devices(void)
 		MAX17048GetCharge(&max17048_charge);
 	#endif
 	
-	pm_device_action_run(i2c1_dev, PM_DEVICE_ACTION_SUSPEND);
+	pm_device_action_run(i2c1_1_dev, PM_DEVICE_ACTION_SUSPEND);
 	
 	while(1)
 	{
@@ -79,14 +79,14 @@ void thread_i2c_devices(void)
 			max17048_read_counter++;
 			if(max17048_read_counter>30)
 			{
-				pm_device_action_run(i2c1_dev, PM_DEVICE_ACTION_RESUME);
+				pm_device_action_run(i2c1_1_dev, PM_DEVICE_ACTION_RESUME);
 				i2c_init();
 
 				max17048_read_counter=0;
 				MAX17048GetVoltage(&max17048_voltage);
 				MAX17048GetCharge(&max17048_charge);
 
-				pm_device_action_run(i2c1_dev, PM_DEVICE_ACTION_SUSPEND);
+				pm_device_action_run(i2c1_1_dev, PM_DEVICE_ACTION_SUSPEND);
 
 				if((max17048_charge>94)&&(charger_data.charger_status == CHARGER_DISABLE))		//correction
 				{

@@ -8,21 +8,16 @@
 
 #include "../config_app.h"
 
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#ifdef USE_DISPLAY 
     #include "lvgl.h"
-#else
-    #ifdef USE_DISPLAY 
-        #include "lvgl/lvgl.h"
-    #endif    
-#endif
-
+#endif    
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
-#define LV_ATTRIBUTE_MEM_ALIGN
+    #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
 #ifndef LV_ATTRIBUTE_IMG_ALTIUM
-#define LV_ATTRIBUTE_IMG_ALTIUM
+    #define LV_ATTRIBUTE_IMG_ALTIUM
 #endif
 
 #ifdef USE_ALTIUM_PICTURE

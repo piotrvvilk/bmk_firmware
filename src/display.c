@@ -246,129 +246,136 @@ void thread_lcd(void)
 //-------------------------------------------------------------------------------------- display init
 	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));	
 
-// 	if (!device_is_ready(display_dev)) 
-// 	{
-// 		LOG_ERR("Device not ready, aborting test");
-// 		return;
-// 	}
-// 	lcd_backlight_on();
+	if (!device_is_ready(display_dev)) 
+	{
+		LOG_ERR("Device not ready, aborting test");
+		return;
+	}
+	lcd_backlight_on();
 
 // -------------------------------------------------------------- 			
-// 	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-// 	LV_IMG_DECLARE(logo);
-// 	lv_obj_t * img1 = lv_img_create(lv_scr_act());
-// 	lv_img_set_src(img1, &logo);
-// 	lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-// 	lv_obj_set_size(img1, 240, 160);
-// 	lv_task_handler();
-// 	display_blanking_off(display_dev);
+	LV_IMG_DECLARE(logo);
+	lv_obj_t * img1 = lv_img_create(lv_scr_act());
+	lv_img_set_src(img1, &logo);
+	lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+	lv_obj_set_size(img1, 240, 160);
+	lv_task_handler();
+	display_blanking_off(display_dev);
     
-	pm_device_action_run(display_dev, PM_DEVICE_ACTION_SUSPEND);
-	pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_SUSPEND);
-
 	while(1)
 	{
 //-------------------------------------------------------------------------------------- pairing process
 		if(lcd_pairing_state!=NO_ACTION)
 		{
-	 		// if(lcd_pairing_state==PAIRING)
-			// {
-			// 	//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-			// 	display_pairing();
-			// }
+	 		if(lcd_pairing_state==PAIRING)
+			{
+				//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+				//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
 
-			// else if(lcd_pairing_state==PAIRED)
-			// {
-			// 	//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-			// 	display_paired();
-			// }
+				display_pairing();
+			}
+
+			else if(lcd_pairing_state==PAIRED)
+			{
+				//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+				//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
+
+				display_paired();
+			}
 			
-			// else if(lcd_pairing_state==PAIRING_CANCELED)
-			// {
-			// 	//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-			// 	display_canceled();
-			// }
+			else if(lcd_pairing_state==PAIRING_CANCELED)
+			{
+				//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+				//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
+
+				display_canceled();
+			}
 		}
 		else
 		{	
 //-------------------------------------------------------------------------------------- themes			
 			if((device_theme!=display_theme)||(refresh_screen_flag==true))
 			{
-// 				refresh_screen_flag=false;
-// //-------------------------------------------------------------------------------------- gta theme
-// 				if(device_theme==THEME_GTA)
-// 				{
-// 					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-// 					display_theme=device_theme;									
-// 					LV_IMG_DECLARE(gta);
-// 					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-// 					lv_img_set_src(img1, &gta);
-// 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-// 					lv_obj_set_size(img1, 320, 190);
-// 					lv_task_handler();
-// 					display_blanking_off(display_dev);
-// 					lcd_backlight_on();
-// 				}
+				refresh_screen_flag=false;
+//-------------------------------------------------------------------------------------- gta theme
+				if(device_theme==THEME_GTA)
+				{
+					//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
 
-// //-------------------------------------------------------------------------------------- altium theme			
-// 				if(device_theme==THEME_ALTIUM)
-// 				{
-// 					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-// 					display_theme=device_theme;
-// 					lv_obj_clean(lv_scr_act());
-// 					LV_IMG_DECLARE(altium);
-// 					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-// 					lv_img_set_src(img1, &altium);
-// 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-// 					lv_obj_set_size(img1, 220, 160);
-// 					lv_task_handler();
-// 					display_blanking_off(display_dev);
-// 					lcd_backlight_on();
-// 				}
+					display_theme=device_theme;									
+					LV_IMG_DECLARE(gta);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &gta);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 320, 190);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
 
-// //-------------------------------------------------------------------------------------- vsc theme			
-// 				if(device_theme==THEME_VSC)
-// 				{
-// 					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-// 					display_theme=device_theme;
-// 					lv_obj_clean(lv_scr_act());
-// 					LV_IMG_DECLARE(vsc);
-// 					lv_obj_t * img1 = lv_img_create(lv_scr_act());
-// 					lv_img_set_src(img1, &vsc);
-// 					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
-// 					lv_obj_set_size(img1, 220, 160);
-// 					lv_task_handler();
-// 					display_blanking_off(display_dev);
-// 					lcd_backlight_on();
-// 				}
+//-------------------------------------------------------------------------------------- altium theme			
+				if(device_theme==THEME_ALTIUM)
+				{
+					//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
 
-// //-------------------------------------------------------------------------------------- info theme			
-// 				if(device_theme==THEME_INFO)
-// 				{
-// 					///m_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
-// 					display_info_screen();									
-// 				}	
+					display_theme=device_theme;
+					lv_obj_clean(lv_scr_act());
+					LV_IMG_DECLARE(altium);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &altium);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
 
-// //-------------------------------------------------------------------------------------- no theme			
-// 				if(device_theme==NO_THEME)
-// 				{
-// 					lcd_backlight_off();
-// 					display_theme=device_theme;
+//-------------------------------------------------------------------------------------- vsc theme			
+				if(device_theme==THEME_VSC)
+				{
+					//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
+
+					display_theme=device_theme;
+					lv_obj_clean(lv_scr_act());
+					LV_IMG_DECLARE(vsc);
+					lv_obj_t * img1 = lv_img_create(lv_scr_act());
+					lv_img_set_src(img1, &vsc);
+					lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+					lv_obj_set_size(img1, 220, 160);
+					lv_task_handler();
+					display_blanking_off(display_dev);
+					lcd_backlight_on();
+				}
+
+//-------------------------------------------------------------------------------------- info theme			
+				if(device_theme==THEME_INFO)
+				{
+					//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_RESUME);
+					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_RESUME);
+					display_info_screen();									
+				}	
+
+//-------------------------------------------------------------------------------------- no theme			
+				if(device_theme==NO_THEME)
+				{
+					lcd_backlight_off();
+					display_theme=device_theme;
 					
-// 					display_blanking_off(display_dev);
-// 					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_SUSPEND);
-
-					
-//				}
+					display_blanking_off(display_dev);
+					//pm_device_action_run(display_dev, PM_DEVICE_ACTION_SUSPEND);
+					//pm_device_action_run(spi3_dev, PM_DEVICE_ACTION_SUSPEND);
+				
+				}
 			}
 		}
 		k_msleep(100);
 	}																					//end while(1)
 }
-
-
-//#endif
 
 //==================================================================================================================================================
 

@@ -109,7 +109,6 @@ static uint8_t key_sequence(const uint8_t *key_tab)
 	 	if(i>32) return 1;
 	}
 	table_size++;	
-	//LOG_INF("Table size: %d, ", table_size);	
 
 	for(i=0;i<table_size;i++)
 	{

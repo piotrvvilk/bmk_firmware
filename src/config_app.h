@@ -44,10 +44,10 @@
 #endif
 
 //======================================================= APPLICATION SETTINGS 
-#define         ACCEL_SENS                      120
-#define         DEVICE_ACTIVE_TIME              5
-#define         DISPLAY_TO_DEFAULT_TIME         5
-#define         BAS_TIME                        10
+#define         ACCEL_SENS                      110
+#define         DEVICE_ACTIVE_TIME              50
+#define         DISPLAY_TO_DEFAULT_TIME         50
+#define         BAS_TIME                        100
 
 //======================================================= 
 

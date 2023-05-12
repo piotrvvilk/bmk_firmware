@@ -8,21 +8,16 @@
 
 #include "../config_app.h"
 
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
-    #include "lvgl.h"
-#else
-  #ifdef USE_DISPLAY 
-    #include "lvgl/lvgl.h"
-  #endif
+#ifdef USE_DISPLAY 
+  #include "lvgl.h"
 #endif
 
-
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
-#define LV_ATTRIBUTE_MEM_ALIGN
+  #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
 #ifndef LV_ATTRIBUTE_IMG_BATTERY
-#define LV_ATTRIBUTE_IMG_BATTERY
+  #define LV_ATTRIBUTE_IMG_BATTERY
 #endif
 
 #ifdef USE_BATTERY_PICTURE
